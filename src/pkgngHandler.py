@@ -21,3 +21,9 @@ def sotwareComment(pkg):
     output = Popen(ccmd, shell=True, stdout=PIPE, close_fds=True)
     lst = output.stdout.readlines()
     return lst[0].rstrip()
+
+def pkgsearch(search):
+    cmd = "pkg search " + search
+    output = Popen(cmd, shell=True, stdout=PIPE, close_fds=True)
+    lst = output.stdout.readlines()
+    return lst
