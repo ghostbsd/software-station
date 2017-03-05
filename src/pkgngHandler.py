@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/local/bin/python3
 
 from subprocess import Popen, PIPE, STDOUT, call
 
@@ -10,17 +10,19 @@ def packagelist(category):
     return lst
 
 
-def softwareVersion(pkg):
+def softwareversion(pkg):
     vcmd = "pkg rquery '%v' " + pkg
     output = Popen(vcmd, shell=True, stdout=PIPE, close_fds=True)
     lst = output.stdout.readlines()
     return lst[0].rstrip()
 
-def sotwareComment(pkg):
+
+def sotwarecomment(pkg):
     ccmd = "pkg rquery '%c' " + pkg
     output = Popen(ccmd, shell=True, stdout=PIPE, close_fds=True)
     lst = output.stdout.readlines()
     return lst[0].rstrip()
+
 
 def pkgsearch(search):
     cmd = "pkg search " + search
