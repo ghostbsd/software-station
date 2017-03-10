@@ -41,56 +41,32 @@ from xpm import xpmPackageCategory, softwareXpm
 
 class TableWindow(Gtk.Window):
 
-    def selection_category(self, tree_selection):
-        (model, pathlist) = tree_selection.get_selected_rows()
-        self.pkg_store.clear()
-        path = pathlist[0]
-        tree_iter = model.get_iter(path)
-        value = model.get_value(tree_iter, 1)
-        xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
-        for line in packagelist(value):
-            print(line)
-            liste = line.split(':')
-            software = liste[0].partition('/')[2]
-            print(software)
-            # version = liste[1]
-            comment = liste[1].strip()
-            self.pkg_store.append([xmp, software, comment])
 
-    def selected_software(self, tree_selection):
-        pass
-
-    def create_arrow_button(self, arrow_type, shadow_type):
-        button = Gtk.Button()
-        arrow = Gtk.Arrow(arrow_type, shadow_type)
-        button.add(arrow)
-        button.show()
-        arrow.show()
-        return button
 
     def __init__(self):
         Gtk.Window.__init__(self)
         self.set_title("Software Station")
         self.connect("delete-event", Gtk.main_quit)
         self.set_size_request(850, 500)
-
+        # Creating the toolbar
         toolbar = Gtk.Toolbar()
         toolbar.set_style(Gtk.ToolbarStyle.BOTH)
         self.box1 = Gtk.VBox(False, 0)
         self.add(self.box1)
         self.box1.show()
         self.box1.pack_start(toolbar, True, True, 0)
-
-        previousbutton = Gtk.ToolButton()
-        previousbutton.set_label("Back")
-        previousbutton.set_is_important(True)
-        previousbutton.set_icon_name("go-previous")
-        toolbar.add(previousbutton)
-        nextbutton = Gtk.ToolButton()
-        nextbutton.set_label("Forward")
-        nextbutton.set_is_important(True)
-        nextbutton.set_icon_name("go-next")
-        toolbar.add(nextbutton)
+        self.previousbutton = Gtk.ToolButton()
+        self.previousbutton.set_label("Back")
+        self.previousbutton.set_is_important(True)
+        self.previousbutton.set_icon_name("go-previous")
+        self.previousbutton.set_sensitive(False)
+        toolbar.add(self.previousbutton)
+        self.nextbutton = Gtk.ToolButton()
+        self.nextbutton.set_label("Forward")
+        self.nextbutton.set_is_important(True)
+        self.nextbutton.set_icon_name("go-next")
+        self.nextbutton.set_sensitive(False)
+        toolbar.add(self.nextbutton)
 
         radiotoolbutton1 = Gtk.RadioToolButton(label="All Software")
         radiotoolbutton1.set_icon_name("package_system")
@@ -107,12 +83,73 @@ class TableWindow(Gtk.Window):
         self.entry = Gtk.Entry()
         self.entry.set_icon_from_icon_name(Gtk.EntryIconPosition.PRIMARY,
                                            "search")
-        self.entry.connect("key-release-event", self.on_key_release)
+        self.entry.connect("key-release-event", self.key_release)
         toolitem.add(self.entry)
-
+        # Creating a notebook to swith
+        self.mainstack = Gtk.Stack()
+        self.mainstack.show()
+        self.mainstack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT)
+        self.box1.pack_start(self.mainstack, True, True, 0)
         table = Gtk.Table(14, 10, True)
         table.show_all()
-        self.box1.pack_start(table, True, True, 0)
+        # self.box1.pack_start(table, True, True, 0)
+        mainwin = MainBook().get_model()
+        self.mainstack.add_named(mainwin, "mainwin")
+
+        self.show_all()
+
+    def key_release(self, widget, event):
+        searchs = widget.get_text()
+        print(searchs)
+        if len(searchs) > 1:
+            MainBook().on_key_release(searchs)
+
+
+class MainBook():
+    """docstring for MainBook."""
+
+    def selected_software(self, widget, path):
+        model = widget.get_model()
+        data = model[path][1]
+        print(data)
+
+    def tree_store(self):
+        self.store.clear()
+        for category in xpmPackageCategory():
+            xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(category[1])
+            self.store.append([xmp, category[0]])
+        return self.store
+
+    def on_key_release(self, searchs):
+        print(searchs)
+        # if len(searchs > 1):
+        self.pkg_store.clear()
+        # xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
+        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 48, 0)
+        for line in pkgsearch(searchs):
+            software = line.partition(' ')[0].strip()
+            # version = liste[1]
+            comment = line.partition(' ')[2].strip()
+            self.pkg_store.append([pixbuf, software, comment])
+
+    def selection_category(self, tree_selection):
+        (model, pathlist) = tree_selection.get_selected_rows()
+        self.pkg_store.clear()
+        path = pathlist[0]
+        tree_iter = model.get_iter(path)
+        value = model.get_value(tree_iter, 1)
+        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 48, 0)
+        # xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
+        for line in packagelist(value):
+            liste = line.split(':')
+            software = liste[0].partition('/')[2]
+            # version = liste[1]
+            comment = liste[1].strip()
+            self.pkg_store.append([pixbuf, software, comment])
+
+    def __init__(self):
+        self.table = Gtk.Table(12, 10, True)
+        self.table.show_all()
         category_sw = Gtk.ScrolledWindow()
         category_sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         category_sw.set_policy(Gtk.PolicyType.AUTOMATIC,
@@ -136,57 +173,51 @@ class TableWindow(Gtk.Window):
         tree_selection.connect("changed", self.selection_category)
         category_sw.add(self.treeview)
         category_sw.show()
+
         pkg_sw = Gtk.ScrolledWindow()
         pkg_sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         pkg_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.pkg_store = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str)
-        treeview = Gtk.TreeView(self.pkg_store)
-        treeview.set_model(self.pkg_store)
-        treeview.set_rules_hint(True)
-        cell = Gtk.CellRendererPixbuf()
-        column3 = Gtk.TreeViewColumn("Pixbuf", cell)
-        column3.add_attribute(cell, "pixbuf", 0)
-        treeview.append_column(column3)
-        cell = Gtk.CellRendererText()
-        column4 = Gtk.TreeViewColumn(None, cell, text=1)
-        # column4.set_sizing(Gtk.TREE_VIEW_COLUMN_AUTOSIZE)
-        column4.set_fixed_width(200)
-        column4.set_sort_column_id(0)
-        treeview.append_column(column4)
-        cell = Gtk.CellRendererText()
-        column5 = Gtk.TreeViewColumn(None, cell, text=2)
-        column5.set_sort_column_id(0)
-        treeview.append_column(column5)
-        treeview.set_headers_visible(False)
-        tree_selection = treeview.get_selection()
-        tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
-        tree_selection.connect("changed", self.selected_software)
-        pkg_sw.add(treeview)
+        # self.pkgtreeview = Gtk.TreeView(self.pkg_store)
+        # self.pkgtreeview.set_model(self.pkg_store)
+        # self.pkgtreeview.set_rules_hint(True)
+        # self.pkgtreeview.connect_after("button_press_event",
+        #                                self.selected_software)
+        # cell = Gtk.CellRendererPixbuf()
+        # column3 = Gtk.TreeViewColumn("Pixbuf", cell)
+        # column3.add_attribute(cell, "pixbuf", 0)
+        # self.pkgtreeview.append_column(column3)
+        # cell = Gtk.CellRendererText()
+        # column4 = Gtk.TreeViewColumn(None, cell, text=1)
+        # # column4.set_sizing(Gtk.TREE_VIEW_COLUMN_AUTOSIZE)
+        # column4.set_fixed_width(200)
+        # column4.set_sort_column_id(0)
+        # self.pkgtreeview.append_column(column4)
+        # cell = Gtk.CellRendererText()
+        # column5 = Gtk.TreeViewColumn(None, cell, text=2)
+        # column5.set_sort_column_id(0)
+        # self.pkgtreeview.append_column(column5)
+        # self.pkgtreeview.set_headers_visible(False)
+        # self.tree_selection = self.pkgtreeview.get_selection()
+        # # self.tree_selection.set_mode(Gtk.SelectionMode.NONE)
+        # # tree_selection.connect("clicked", self.selected_software)
+        # pkg_sw.add(self.pkgtreeview)
+        iconview = Gtk.IconView.new()
+        iconview.set_model(self.pkg_store)
+        iconview.set_pixbuf_column(0)
+        iconview.set_text_column(1)
+        iconview.connect("item-activated", self.selected_software)
+        iconview.set_tooltip_column(2)
+        pkg_sw.add(iconview)
         pkg_sw.show()
         state = Gtk.Statusbar()
         # table.attach(toolbar, 0, 10, 0, 2)
-        table.attach(category_sw, 0, 2, 0, 14)
-        table.attach(pkg_sw, 2, 10, 0, 13)
-        table.attach(state, 2, 10, 13, 14)
-        self.show_all()
+        self.table.attach(category_sw, 0, 2, 0, 12)
+        self.table.attach(pkg_sw, 2, 10, 0, 11)
+        self.table.attach(state, 2, 10, 11, 12)
 
-    def on_key_release(self, widget, event):
-        if len(widget.get_text()) > 1:
-            self.pkg_store.clear()
-            xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
-            for line in pkgsearch(widget.get_text()):
-                software = line.partition(' ')[0].strip()
-                # version = liste[1]
-                comment = line.partition(' ')[2].strip()
-                print comment
-                self.pkg_store.append([xmp, software, comment])
-
-    def tree_store(self):
-        self.store.clear()
-        for category in xpmPackageCategory():
-            xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(category[1])
-            self.store.append([xmp, category[0]])
-        return self.store
+    def get_model(self):
+        return self.table
 
 TableWindow()
 Gtk.main()
