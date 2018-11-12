@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3.6
 
-from subprocess import Popen, PIPE, STDOUT, call
+from subprocess import Popen, PIPE
 
 
 def package_origin():
@@ -33,6 +33,7 @@ def package_dictionary(origin_list):
             pl = pkg.split('/')
             pi = pl[1].split(':')
             pkg_dict[pl[0]].update({pi[0]: pi[1]})
+            pkg_dict['all'].update({pi[0]: pi[1]})
     return pkg_dict
 
 
@@ -66,4 +67,3 @@ def pkgsearch(search):
                    universal_newlines=True)
     lst = output.stdout.readlines()
     return lst
-

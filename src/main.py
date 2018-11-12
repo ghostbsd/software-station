@@ -35,9 +35,9 @@ import threading
 from time import sleep
 # import threading
 # import sys
-from pkgngHandler import packagelist  # , softwareversion, sotwarecomment
+from pkgngHandler import packagelist
 from pkgngHandler import pkgsearch, package_origin, package_dictionary
-from xpm import xpmPackageCategory, softwareXpm
+from xpm import xpmPackageCategory
 
 
 class TableWindow(Gtk.Window):
@@ -102,8 +102,8 @@ class TableWindow(Gtk.Window):
         self.progress = Gtk.ProgressBar()
         self.progress.set_show_text(True)
         grid = Gtk.Grid()
-        #grid.set_row_spacing(1)
-        #grid.set_column_spacing(10)
+        # grid.set_row_spacing(1)
+        # grid.set_column_spacing(10)
         grid.set_margin_left(10)
         grid.set_margin_right(10)
         grid.set_margin_top(10)
@@ -155,9 +155,10 @@ class TableWindow(Gtk.Window):
 
     def category_store_sync(self):
         self.store.clear()
-        for category in xpmPackageCategory():
-            xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(category[1])
-            self.store.append([xmp, category[0]])
+        for category in self.pkg_origin:
+            xmp_data = xpmPackageCategory()[category]
+            xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(xmp_data)
+            self.store.append([xmp, category])
 
     def on_key_release(self, searchs):
         print(searchs)
@@ -179,12 +180,11 @@ class TableWindow(Gtk.Window):
         value = model.get_value(tree_iter, 1)
         pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 48, 0)
         # xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
-        for line in packagelist(value):
-            liste = line.split(':')
-            software = liste[0].partition('/')[2]
-            # version = liste[1]
-            comment = liste[1].strip()
-            self.pkg_store.append([pixbuf, software, comment])
+        pkg_d = self.pkg_dictionary[value]
+        pkg_list = list(pkg_d.keys())
+        for pkg in pkg_list:
+            comment = pkg_d[pkg]
+            self.pkg_store.append([pixbuf, pkg, comment])
 
     def MainBook(self):
         self.table = Gtk.Table(12, 10, True)
