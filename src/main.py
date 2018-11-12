@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/python3.6
 """
 Copyright (c) 2017, GhostBSD. All rights reserved.
 
@@ -31,17 +31,16 @@ POSSIBILITY OF SUCH DAMAGE.
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf
-
+import threading
+from time import sleep
 # import threading
 # import sys
 from pkgngHandler import packagelist  # , softwareversion, sotwarecomment
-from pkgngHandler import pkgsearch
+from pkgngHandler import pkgsearch, package_origin, package_dictionary
 from xpm import xpmPackageCategory, softwareXpm
 
 
 class TableWindow(Gtk.Window):
-
-
 
     def __init__(self):
         Gtk.Window.__init__(self)
@@ -54,7 +53,7 @@ class TableWindow(Gtk.Window):
         self.box1 = Gtk.VBox(False, 0)
         self.add(self.box1)
         self.box1.show()
-        self.box1.pack_start(toolbar, True, True, 0)
+        self.box1.pack_start(toolbar, False, False, 0)
         self.previousbutton = Gtk.ToolButton()
         self.previousbutton.set_label("Back")
         self.previousbutton.set_is_important(True)
@@ -90,35 +89,75 @@ class TableWindow(Gtk.Window):
         self.mainstack.show()
         self.mainstack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT)
         self.box1.pack_start(self.mainstack, True, True, 0)
-        table = Gtk.Table(14, 10, True)
-        table.show_all()
-        # self.box1.pack_start(table, True, True, 0)
-        mainwin = MainBook().get_model()
+
+        mainwin = self.MainBook()
         self.mainstack.add_named(mainwin, "mainwin")
 
+        # state = Gtk.Notebook()
+        # state.show()
+        self.pkg_statistic = Gtk.Label()
+
+        self.pkg_statistic.set_use_markup(True)
+        self.pkg_statistic.set_xalign(0.1)
+        self.progress = Gtk.ProgressBar()
+        self.progress.set_show_text(True)
+        grid = Gtk.Grid()
+        #grid.set_row_spacing(1)
+        #grid.set_column_spacing(10)
+        grid.set_margin_left(10)
+        grid.set_margin_right(10)
+        grid.set_margin_top(10)
+        grid.set_margin_bottom(10)
+        grid.set_column_homogeneous(True)
+        grid.set_row_homogeneous(True)
+        grid.attach(self.pkg_statistic, 0, 0, 4, 1)
+        grid.attach(self.progress, 4, 0, 6, 1)
+        grid.show()
+        self.box1.pack_start(grid, False, False, 0)
         self.show_all()
+        self.initial_thread()
 
-    def key_release(self, widget, event):
-        searchs = widget.get_text()
-        print(searchs)
-        if len(searchs) > 1:
-            MainBook().on_key_release(searchs)
+    def sync_orgin(self):
+        self.pkg_origin = package_origin()
 
+    def sync_packages(self):
+        self.pkg_dictionary = package_dictionary(self.pkg_origin)
 
-class MainBook():
-    """docstring for MainBook."""
+    def initial_sync(self):
+        self.pkg_statistic.set_text('<small>Syncing statistic</small>')
+        self.pkg_statistic.set_use_markup(True)
+        self.progress.set_fraction(0.1)
+        self.progress.set_text('syncing packages origins')
+        self.sync_orgin()
+        self.progress.set_fraction(0.4)
+        self.progress.set_text('syncing packages data')
+        self.sync_packages()
+        self.progress.set_fraction(0.8)
+        self.progress.set_text('store packages origin')
+        self.category_store_sync()
+        avail = self.pkg_dictionary['avail']
+        self.pkg_statistic.set_text(f'<small>Packages available: {avail}</small>')
+        self.pkg_statistic.set_use_markup(True)
+        self.progress.set_fraction(1)
+        self.progress.set_text('completed')
+        sleep(1)
+        self.progress.hide()
+
+    def initial_thread(self):
+        thr = threading.Thread(target=self.initial_sync, args=())
+        thr.setDaemon(True)
+        thr.start()
 
     def selected_software(self, widget, path):
         model = widget.get_model()
         data = model[path][1]
         print(data)
 
-    def tree_store(self):
+    def category_store_sync(self):
         self.store.clear()
         for category in xpmPackageCategory():
             xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(category[1])
             self.store.append([xmp, category[0]])
-        return self.store
 
     def on_key_release(self, searchs):
         print(searchs)
@@ -147,7 +186,7 @@ class MainBook():
             comment = liste[1].strip()
             self.pkg_store.append([pixbuf, software, comment])
 
-    def __init__(self):
+    def MainBook(self):
         self.table = Gtk.Table(12, 10, True)
         self.table.show_all()
         category_sw = Gtk.ScrolledWindow()
@@ -155,7 +194,7 @@ class MainBook():
         category_sw.set_policy(Gtk.PolicyType.AUTOMATIC,
                                Gtk.PolicyType.AUTOMATIC)
         self.store = Gtk.ListStore(GdkPixbuf.Pixbuf, str)
-        self.treeview = Gtk.TreeView(self.tree_store())
+        self.treeview = Gtk.TreeView(self.store)
         self.treeview.set_model(self.store)
         self.treeview.set_rules_hint(True)
         cell = Gtk.CellRendererPixbuf()
@@ -210,14 +249,18 @@ class MainBook():
         iconview.set_tooltip_column(2)
         pkg_sw.add(iconview)
         pkg_sw.show()
-        state = Gtk.Statusbar()
         # table.attach(toolbar, 0, 10, 0, 2)
         self.table.attach(category_sw, 0, 2, 0, 12)
-        self.table.attach(pkg_sw, 2, 10, 0, 11)
-        self.table.attach(state, 2, 10, 11, 12)
-
-    def get_model(self):
+        self.table.attach(pkg_sw, 2, 10, 0, 12)
+        self.show()
         return self.table
+
+    def key_release(self, widget, event):
+        searchs = widget.get_text()
+        print(searchs)
+        # if len(searchs) > 1:
+        self.on_key_release(searchs)
+
 
 TableWindow()
 Gtk.main()
