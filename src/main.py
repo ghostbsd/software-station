@@ -30,12 +30,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf
+from gi.repository import Gtk, GdkPixbuf, GLib, GObject
 import threading
 from time import sleep
-# import threading
-# import sys
-from pkgngHandler import packagelist
+
 from pkgngHandler import pkgsearch, package_origin, package_dictionary
 from xpm import xpmPackageCategory
 
@@ -129,15 +127,20 @@ class TableWindow(Gtk.Window):
         self.progress.set_fraction(0.1)
         self.progress.set_text('syncing packages origins')
         self.sync_orgin()
-        self.progress.set_fraction(0.4)
+        self.progress.set_fraction(0.3)
         self.progress.set_text('syncing packages data')
         self.sync_packages()
-        self.progress.set_fraction(0.8)
+        self.progress.set_fraction(0.5)
         self.progress.set_text('store packages origin')
         self.category_store_sync()
         avail = self.pkg_dictionary['avail']
-        self.pkg_statistic.set_text(f'<small>Packages available: {avail}</small>')
+        msg = "Packages available:"
+        self.pkg_statistic.set_text(f'<small>{msg} {avail}</small>')
         self.pkg_statistic.set_use_markup(True)
+        self.progress.show()
+        self.progress.set_fraction(0.7)
+        self.progress.set_text('Loading all packages')
+        self.store_all_pkgs()
         self.progress.set_fraction(1)
         self.progress.set_text('completed')
         sleep(1)
@@ -159,6 +162,27 @@ class TableWindow(Gtk.Window):
             xmp_data = xpmPackageCategory()[category]
             xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(xmp_data)
             self.store.append([xmp, category])
+        # self.treeview.set_cursor(0)
+
+    def update_progess(self, pkg_store, pixbuf, pkg, comment):
+        pkg_store.append([pixbuf, pkg, comment])
+
+    def store_all_pkgs(self):
+        self.pkg_store.clear()
+        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 48, 0)
+        pkg_d = self.pkg_dictionary['all']
+        pkg_list = list(pkg_d.keys())
+        pkg_list.sort()
+        for pkg in pkg_list:
+            comment = pkg_d[pkg]
+            # self.pkg_store.append([pixbuf, pkg, comment])
+            GObject.idle_add(
+                self.update_progess,
+                self.pkg_store,
+                pixbuf,
+                pkg,
+                comment
+            )
 
     def on_key_release(self, searchs):
         print(searchs)
@@ -217,37 +241,37 @@ class TableWindow(Gtk.Window):
         pkg_sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         pkg_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.pkg_store = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str)
-        # self.pkgtreeview = Gtk.TreeView(self.pkg_store)
-        # self.pkgtreeview.set_model(self.pkg_store)
-        # self.pkgtreeview.set_rules_hint(True)
-        # self.pkgtreeview.connect_after("button_press_event",
-        #                                self.selected_software)
-        # cell = Gtk.CellRendererPixbuf()
-        # column3 = Gtk.TreeViewColumn("Pixbuf", cell)
-        # column3.add_attribute(cell, "pixbuf", 0)
-        # self.pkgtreeview.append_column(column3)
-        # cell = Gtk.CellRendererText()
-        # column4 = Gtk.TreeViewColumn(None, cell, text=1)
-        # # column4.set_sizing(Gtk.TREE_VIEW_COLUMN_AUTOSIZE)
-        # column4.set_fixed_width(200)
-        # column4.set_sort_column_id(0)
-        # self.pkgtreeview.append_column(column4)
-        # cell = Gtk.CellRendererText()
-        # column5 = Gtk.TreeViewColumn(None, cell, text=2)
-        # column5.set_sort_column_id(0)
-        # self.pkgtreeview.append_column(column5)
-        # self.pkgtreeview.set_headers_visible(False)
-        # self.tree_selection = self.pkgtreeview.get_selection()
-        # # self.tree_selection.set_mode(Gtk.SelectionMode.NONE)
-        # # tree_selection.connect("clicked", self.selected_software)
-        # pkg_sw.add(self.pkgtreeview)
-        iconview = Gtk.IconView.new()
-        iconview.set_model(self.pkg_store)
-        iconview.set_pixbuf_column(0)
-        iconview.set_text_column(1)
-        iconview.connect("item-activated", self.selected_software)
-        iconview.set_tooltip_column(2)
-        pkg_sw.add(iconview)
+        self.pkgtreeview = Gtk.TreeView(self.pkg_store)
+        self.pkgtreeview.set_model(self.pkg_store)
+        self.pkgtreeview.set_rules_hint(True)
+        self.pkgtreeview.connect_after("button_press_event",
+                                       self.selected_software)
+        cell = Gtk.CellRendererPixbuf()
+        column3 = Gtk.TreeViewColumn("Pixbuf", cell)
+        column3.add_attribute(cell, "pixbuf", 0)
+        self.pkgtreeview.append_column(column3)
+        cell = Gtk.CellRendererText()
+        column4 = Gtk.TreeViewColumn(None, cell, text=1)
+        # column4.set_sizing(Gtk.TREE_VIEW_COLUMN_AUTOSIZE)
+        column4.set_fixed_width(200)
+        column4.set_sort_column_id(0)
+        self.pkgtreeview.append_column(column4)
+        cell = Gtk.CellRendererText()
+        column5 = Gtk.TreeViewColumn(None, cell, text=2)
+        column5.set_sort_column_id(0)
+        self.pkgtreeview.append_column(column5)
+        self.pkgtreeview.set_headers_visible(False)
+        self.tree_selection = self.pkgtreeview.get_selection()
+        # self.tree_selection.set_mode(Gtk.SelectionMode.NONE)
+        # tree_selection.connect("clicked", self.selected_software)
+        pkg_sw.add(self.pkgtreeview)
+        # iconview = Gtk.IconView.new()
+        # iconview.set_model(self.pkg_store)
+        # iconview.set_pixbuf_column(0)
+        # iconview.set_text_column(1)
+        # iconview.connect("item-activated", self.selected_software)
+        # iconview.set_tooltip_column(2)
+        # pkg_sw.add(iconview)
         pkg_sw.show()
         # table.attach(toolbar, 0, 10, 0, 2)
         self.table.attach(category_sw, 0, 2, 0, 12)

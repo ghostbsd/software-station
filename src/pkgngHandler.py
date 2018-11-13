@@ -10,7 +10,7 @@ def package_origin():
     lst = list(set(pkg_out.stdout.read().splitlines()))
     lst.remove('base')
     lst.sort()
-    return ['all'] + lst
+    return lst
 
 
 def package_list():
@@ -25,7 +25,7 @@ def package_list():
 def package_dictionary(origin_list):
     pkg_list = package_list()
     avail = str(len(pkg_list))
-    pkg_dict = {'avail': avail}
+    pkg_dict = {'avail': avail, 'all': {}}
     for origin in origin_list:
         pkg_dict[origin] = {}
     for pkg in pkg_list:
