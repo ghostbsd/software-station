@@ -184,17 +184,22 @@ class TableWindow(Gtk.Window):
                 comment
             )
 
-    def on_key_release(self, searchs):
+    def key_release(self, widget, event):
+        searchs = widget.get_text()
         print(searchs)
-        # if len(searchs > 1):
-        self.pkg_store.clear()
-        # xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
-        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 48, 0)
-        for line in pkgsearch(searchs):
-            software = line.partition(' ')[0].strip()
-            # version = liste[1]
-            comment = line.partition(' ')[2].strip()
-            self.pkg_store.append([pixbuf, software, comment])
+        if len(searchs) > 1:
+            self.pkg_store.clear()
+            # xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
+            pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 48, 0)
+            for line in pkgsearch(searchs):
+                pkg_v = line.partition(' ')[0].strip()
+                dash_split = pkg_v.split('-')
+                num_of_dash = int(len(dash_split) - 1)
+                rversion = dash_split[num_of_dash]
+                software = pkg_v.replace(f'-{rversion}', '')
+                # version = liste[1]
+                comment = self.pkg_dictionary['all'][software]
+                self.pkg_store.append([pixbuf, software, comment])
 
     def selection_category(self, tree_selection):
         (model, pathlist) = tree_selection.get_selected_rows()
@@ -278,13 +283,6 @@ class TableWindow(Gtk.Window):
         self.table.attach(pkg_sw, 2, 10, 0, 12)
         self.show()
         return self.table
-
-    def key_release(self, widget, event):
-        searchs = widget.get_text()
-        print(searchs)
-        # if len(searchs) > 1:
-        self.on_key_release(searchs)
-
 
 TableWindow()
 Gtk.main()
