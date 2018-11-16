@@ -7,6 +7,7 @@ pygtk.require('2.0')
 import gtk
 import gobject
 
+
 class stock_list(gtk.TreeView):
     def __init__(self):
         gtk.TreeView.__init__(self)
@@ -35,6 +36,7 @@ class stock_list(gtk.TreeView):
         col.pack_start(render_text, expand=True)
         col.add_attribute(render_text, 'text', 1)
         self.append_column(col)
+
 
 if __name__ == '__main__':
     w = gtk.Window()

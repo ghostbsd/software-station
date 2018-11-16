@@ -32,10 +32,18 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GLib, GObject
 import threading
-from time import sleep
+# from time import sleep
 
-from pkgngHandler import pkgsearch, package_origin, package_dictionary
+from pkgngHandler import search_packages, available_package_origin
+from pkgngHandler import available_package_dictionary, isntalled_package_origin
+from pkgngHandler import isntalled_package_dictionary
 from xpm import xpmPackageCategory
+
+global pkg_to_install
+pkg_to_install = []
+
+global pkg_to_uninstall
+pkg_to_uninstall = []
 
 
 class TableWindow(Gtk.Window):
@@ -47,7 +55,7 @@ class TableWindow(Gtk.Window):
         self.set_size_request(850, 500)
         # Creating the toolbar
         toolbar = Gtk.Toolbar()
-        toolbar.set_style(Gtk.ToolbarStyle.BOTH)
+        # toolbar.set_style(Gtk.ToolbarStyle.BOTH)
         self.box1 = Gtk.VBox(False, 0)
         self.add(self.box1)
         self.box1.show()
@@ -57,31 +65,59 @@ class TableWindow(Gtk.Window):
         self.previousbutton.set_is_important(True)
         self.previousbutton.set_icon_name("go-previous")
         self.previousbutton.set_sensitive(False)
-        toolbar.add(self.previousbutton)
+        toolbar.insert(self.previousbutton, -1)
         self.nextbutton = Gtk.ToolButton()
         self.nextbutton.set_label("Forward")
         self.nextbutton.set_is_important(True)
         self.nextbutton.set_icon_name("go-next")
         self.nextbutton.set_sensitive(False)
-        toolbar.add(self.nextbutton)
+        toolbar.insert(self.nextbutton, -2)
 
         radiotoolbutton1 = Gtk.RadioToolButton(label="All Software")
         radiotoolbutton1.set_icon_name("package_system")
-        toolbar.add(radiotoolbutton1)
-        radiotoolbutton2 = Gtk.RadioToolButton(label="Isntalled Software",
+        self.available_or_installed = 'available'
+        radiotoolbutton1.connect("toggled", self.all_or_installed, "available")
+        toolbar.insert(radiotoolbutton1, -3)
+        radiotoolbutton2 = Gtk.RadioToolButton(label="Installed Software",
                                                group=radiotoolbutton1)
         radiotoolbutton2.set_icon_name("system")
-        toolbar.add(radiotoolbutton2)
+        radiotoolbutton2.connect("toggled", self.all_or_installed, "installed")
+        toolbar.insert(radiotoolbutton2, -4)
         separatortoolitem = Gtk.SeparatorToolItem()
-        toolbar.add(separatortoolitem)
-
+        toolbar.insert(separatortoolitem, -5)
         toolitem = Gtk.ToolItem()
-        toolbar.add(toolitem)
+        toolbar.insert(toolitem, -6)
+        toolitem.set_expand(True)
         self.entry = Gtk.Entry()
         self.entry.set_icon_from_icon_name(Gtk.EntryIconPosition.PRIMARY,
                                            "search")
-        self.entry.connect("key-release-event", self.key_release)
-        toolitem.add(self.entry)
+        self.entry.connect("key-release-event", self.search_release)
+        hBox = Gtk.HBox(False, 0)
+        toolitem.add(hBox)
+        hBox.show()
+        hBox.pack_start(self.entry, False, False, 0)
+        self.apply_button = Gtk.Button()
+        self.apply_button.set_label("Apply")
+        # self.apply_button.set_is_important(True)
+        # self.apply_button.set_stock_id('gtk-apply')
+        apply_img = Gtk.Image()
+        apply_img.set_from_icon_name('gtk-apply', 1)
+        self.apply_button.set_image(apply_img)
+        self.apply_button.set_property("tooltip-text", "Apply change on the system")
+        self.apply_button.set_sensitive(False)
+        hBox.pack_end(self.apply_button, False, False, 0)
+        # toolbar.insert(self.apply_button, -1)
+        self.cancel_button = Gtk.Button()
+        self.cancel_button.set_label("Cancel")
+        # self.cancel_button.set_is_important(True)
+        cancel_img = Gtk.Image()
+        cancel_img.set_from_icon_name('gtk-apply', 1)
+        self.cancel_button.set_image(cancel_img)
+        self.cancel_button.set_sensitive(False)
+        self.cancel_button.set_property("tooltip-text", "Cancel changes")
+        hBox.pack_end(self.cancel_button, False, False, 0)
+        # toolbar.insert(self.cancel_button, -2)
+
         # Creating a notebook to swith
         self.mainstack = Gtk.Stack()
         self.mainstack.show()
@@ -93,15 +129,14 @@ class TableWindow(Gtk.Window):
 
         # state = Gtk.Notebook()
         # state.show()
-        self.pkg_statistic = Gtk.Label()
-
+        self.pkg_statistic = Gtk.Label('adlk;fjalkdjfajdlkfj')
         self.pkg_statistic.set_use_markup(True)
-        self.pkg_statistic.set_xalign(0.1)
+        self.pkg_statistic.set_xalign(0.0)
         self.progress = Gtk.ProgressBar()
         self.progress.set_show_text(True)
         grid = Gtk.Grid()
         # grid.set_row_spacing(1)
-        # grid.set_column_spacing(10)
+        grid.set_column_spacing(10)
         grid.set_margin_left(10)
         grid.set_margin_right(10)
         grid.set_margin_top(10)
@@ -113,13 +148,57 @@ class TableWindow(Gtk.Window):
         grid.show()
         self.box1.pack_start(grid, False, False, 0)
         self.show_all()
-        self.initial_thread()
+        self.initial_thread('initial')
+
+    def all_or_installed(self, widget, data):
+        if widget.get_active():
+            self.available_or_installed = data
+            self.treeview.set_cursor(1)
+            self.treeview.set_cursor(0)
+            if data == 'available':
+                avail = self.available_pkg['avail']
+                msg = "Packages available:"
+                self.pkg_statistic.set_text(f'<small>{msg} {avail}</small>')
+                self.pkg_statistic.set_use_markup(True)
+            else:
+                installed = self.installed_pkg['avail']
+                msg = "Installed packages:"
+                self.pkg_statistic.set_text(f'<small>{msg} {installed}</small>')
+                self.pkg_statistic.set_use_markup(True)
+            print(data)
 
     def sync_orgin(self):
-        self.pkg_origin = package_origin()
+        self.pkg_origin = available_package_origin()
 
     def sync_packages(self):
-        self.pkg_dictionary = package_dictionary(self.pkg_origin)
+        self.installed_origin = isntalled_package_origin()
+        self.installed_pkg = isntalled_package_dictionary(self.installed_origin)
+        self.available_pkg = available_package_dictionary(self.pkg_origin)
+
+    def update_progress(self, fraction, msg):
+        self.progress.set_fraction(fraction)
+        self.progress.set_text(msg)
+
+    def sync_alvailable(self):
+        self.progress.show()
+        GLib.idle_add(self.update_progress, 0.4, 'store packages origin')
+        self.category_store_sync2()
+        # GObject.idle_add(self.category_store_sync2)
+        avail = self.available_pkg['avail']
+        msg = "Packages available:"
+        self.pkg_statistic.set_text(f'<small>{msg} {avail}</small>')
+        self.pkg_statistic.set_use_markup(True)
+        GLib.idle_add(self.update_progress, 0.7, 'Loading all packages')
+        # GObject.idle_add(self.store_all_pkgs)
+        self.store_all_pkgs()
+        GLib.idle_add(self.update_progress, 1.0, 'completed')
+        self.progress.hide()
+        GObject.idle_add(self.stop_tread)
+
+    def available_thread(self):
+        self.thr = threading.Thread(target=self.sync_alvailable, args=())
+        self.thr.setDaemon(True)
+        self.thr.start()
 
     def initial_sync(self):
         self.pkg_statistic.set_text('<small>Syncing statistic</small>')
@@ -133,28 +212,32 @@ class TableWindow(Gtk.Window):
         self.progress.set_fraction(0.5)
         self.progress.set_text('store packages origin')
         self.category_store_sync()
-        avail = self.pkg_dictionary['avail']
+        avail = self.available_pkg['avail']
         msg = "Packages available:"
         self.pkg_statistic.set_text(f'<small>{msg} {avail}</small>')
         self.pkg_statistic.set_use_markup(True)
-        self.progress.show()
-        self.progress.set_fraction(0.7)
-        self.progress.set_text('Loading all packages')
-        self.store_all_pkgs()
+        # self.progress.show()
+        # self.progress.set_fraction(0.7)
+        # self.progress.set_text('Loading all packages')
+        # GObject.idle_add(self.store_all_pkgs)
         self.progress.set_fraction(1)
         self.progress.set_text('completed')
-        sleep(1)
         self.progress.hide()
+        GObject.idle_add(self.stop_tread)
 
-    def initial_thread(self):
-        thr = threading.Thread(target=self.initial_sync, args=())
-        thr.setDaemon(True)
-        thr.start()
+    def stop_tread(self):
+        self.thr.join()
 
-    def selected_software(self, widget, path):
-        model = widget.get_model()
-        data = model[path][1]
-        print(data)
+    def initial_thread(self, sync):
+        self.thr = threading.Thread(target=self.initial_sync, args=())
+        self.thr.setDaemon(True)
+        self.thr.start()
+        # thr.join()
+
+    def selected_software(self, view, event):
+        selection = self.pkgtreeview.get_selection()
+        (model, iter) = selection.get_selected()
+        print(model[iter][1])
 
     def category_store_sync(self):
         self.store.clear()
@@ -162,44 +245,32 @@ class TableWindow(Gtk.Window):
             xmp_data = xpmPackageCategory()[category]
             xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(xmp_data)
             self.store.append([xmp, category])
-        # self.treeview.set_cursor(0)
-
-    def update_progess(self, pkg_store, pixbuf, pkg, comment):
-        pkg_store.append([pixbuf, pkg, comment])
+        self.treeview.set_cursor(0)
 
     def store_all_pkgs(self):
         self.pkg_store.clear()
-        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 48, 0)
-        pkg_d = self.pkg_dictionary['all']
+        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 42, 0)
+        pkg_d = self.available_pkg['all']
         pkg_list = list(pkg_d.keys())
         pkg_list.sort()
         for pkg in pkg_list:
-            comment = pkg_d[pkg]
-            # self.pkg_store.append([pixbuf, pkg, comment])
-            GObject.idle_add(
-                self.update_progess,
-                self.pkg_store,
-                pixbuf,
-                pkg,
-                comment
-            )
+            version = pkg_d[pkg]['version']
+            size = pkg_d[pkg]['size']
+            installed = pkg_d[pkg]['installed']
+            self.pkg_store.append([pixbuf, pkg, version, size, installed])
 
-    def key_release(self, widget, event):
+    def search_release(self, widget, event):
         searchs = widget.get_text()
         print(searchs)
+        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 42, 0)
         if len(searchs) > 1:
             self.pkg_store.clear()
             # xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
-            pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 48, 0)
-            for line in pkgsearch(searchs):
-                pkg_v = line.partition(' ')[0].strip()
-                dash_split = pkg_v.split('-')
-                num_of_dash = int(len(dash_split) - 1)
-                rversion = dash_split[num_of_dash]
-                software = pkg_v.replace(f'-{rversion}', '')
-                # version = liste[1]
-                comment = self.pkg_dictionary['all'][software]
-                self.pkg_store.append([pixbuf, software, comment])
+            for pkg in search_packages(searchs):
+                version = self.available_pkg['all'][pkg]['version']
+                size = self.available_pkg['all'][pkg]['size']
+                installed = self.available_pkg['all'][pkg]['installed']
+                self.pkg_store.append([pixbuf, pkg, version, size, installed])
 
     def selection_category(self, tree_selection):
         (model, pathlist) = tree_selection.get_selected_rows()
@@ -207,13 +278,43 @@ class TableWindow(Gtk.Window):
         path = pathlist[0]
         tree_iter = model.get_iter(path)
         value = model.get_value(tree_iter, 1)
-        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 48, 0)
+        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 42, 0)
         # xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
-        pkg_d = self.pkg_dictionary[value]
+        if self.available_or_installed == 'available':
+            pkg_d = self.available_pkg[value]
+        else:
+            try:
+                pkg_d = self.installed_pkg[value]
+            except KeyError:
+                pkg_d = {}
         pkg_list = list(pkg_d.keys())
         for pkg in pkg_list:
-            comment = pkg_d[pkg]
-            self.pkg_store.append([pixbuf, pkg, comment])
+            version = pkg_d[pkg]['version']
+            size = pkg_d[pkg]['size']
+            installed = pkg_d[pkg]['installed']
+            self.pkg_store.append([pixbuf, pkg, version, size, installed])
+
+    def add_and_rm_pkg(self, cell, path, model):
+        model[path][4] = not model[path][4]
+        pkg = model[path][1]
+        if pkg not in pkg_to_uninstall and pkg not in pkg_to_install:
+            if model[path][4] is False:
+                pkg_to_uninstall.extend([pkg])
+            else:
+                pkg_to_install.extend([pkg])
+        else:
+            if pkg in pkg_to_uninstall and model[path][4] is True:
+                pkg_to_uninstall.remove(pkg)
+            elif pkg in pkg_to_install and model[path][4] is False:
+                pkg_to_install.remove(pkg)
+        if pkg not in pkg_to_uninstall and pkg not in pkg_to_install:
+            self.apply_button.set_sensitive(False)
+            self.cancel_button.set_sensitive(False)
+        else:
+            self.apply_button.set_sensitive(True)
+            self.cancel_button.set_sensitive(True)
+        print('package to install', pkg_to_install)
+        print('package to uninstall', pkg_to_uninstall)
 
     def MainBook(self):
         self.table = Gtk.Table(12, 10, True)
@@ -236,38 +337,51 @@ class TableWindow(Gtk.Window):
         self.treeview.append_column(column2)
         self.treeview.set_reorderable(True)
         self.treeview.set_headers_visible(False)
-        tree_selection = self.treeview.get_selection()
-        tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
-        tree_selection.connect("changed", self.selection_category)
+        self.category_tree_selection = self.treeview.get_selection()
+        self.category_tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
+        self.category_tree_selection.connect("changed", self.selection_category)
         category_sw.add(self.treeview)
         category_sw.show()
 
         pkg_sw = Gtk.ScrolledWindow()
         pkg_sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         pkg_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        self.pkg_store = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str)
+        self.pkg_store = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str, bool)
         self.pkgtreeview = Gtk.TreeView(self.pkg_store)
         self.pkgtreeview.set_model(self.pkg_store)
         self.pkgtreeview.set_rules_hint(True)
+        # self.pkgtreeview.connect_after("button_press_event",
+        #                                self.selected_software)
         self.pkgtreeview.connect_after("button_press_event",
                                        self.selected_software)
-        cell = Gtk.CellRendererPixbuf()
-        column3 = Gtk.TreeViewColumn("Pixbuf", cell)
-        column3.add_attribute(cell, "pixbuf", 0)
-        self.pkgtreeview.append_column(column3)
-        cell = Gtk.CellRendererText()
-        column4 = Gtk.TreeViewColumn(None, cell, text=1)
-        # column4.set_sizing(Gtk.TREE_VIEW_COLUMN_AUTOSIZE)
-        column4.set_fixed_width(200)
-        column4.set_sort_column_id(0)
-        self.pkgtreeview.append_column(column4)
-        cell = Gtk.CellRendererText()
-        column5 = Gtk.TreeViewColumn(None, cell, text=2)
-        column5.set_sort_column_id(0)
-        self.pkgtreeview.append_column(column5)
-        self.pkgtreeview.set_headers_visible(False)
-        self.tree_selection = self.pkgtreeview.get_selection()
-        # self.tree_selection.set_mode(Gtk.SelectionMode.NONE)
+        self.check_cell = Gtk.CellRendererToggle()
+        self.check_cell.set_property('activatable', True)
+        self.check_cell.connect('toggled', self.add_and_rm_pkg, self.pkg_store)
+        check_column = Gtk.TreeViewColumn("Check", self.check_cell)
+        check_column.add_attribute(self.check_cell, "active", 4)
+        self.pkgtreeview.append_column(check_column)
+        pixbuf_cell = Gtk.CellRendererPixbuf()
+        pixbuf_column = Gtk.TreeViewColumn('Icon', pixbuf_cell)
+        pixbuf_column.add_attribute(pixbuf_cell, "pixbuf", 0)
+        self.pkgtreeview.append_column(pixbuf_column)
+        name_cell = Gtk.CellRendererText()
+        name_column = Gtk.TreeViewColumn('Package Name', name_cell, text=1)
+        # name_column.set_sizing(Gtk.TREE_VIEW_COLUMN_AUTOSIZE)
+        name_column.set_fixed_width(250)
+        name_column.set_sort_column_id(1)
+        self.pkgtreeview.append_column(name_column)
+        version_cell = Gtk.CellRendererText()
+        version_column = Gtk.TreeViewColumn('Version', version_cell, text=2)
+        version_column.set_fixed_width(150)
+        version_column.set_sort_column_id(2)
+        self.pkgtreeview.append_column(version_column)
+        size_cell = Gtk.CellRendererText()
+        size_column = Gtk.TreeViewColumn('Size', size_cell, text=3)
+        size_column.set_sort_column_id(3)
+        self.pkgtreeview.append_column(size_column)
+        # self.pkgtreeview.set_headers_visible(False)
+        self.pkg_tree_selection = self.pkgtreeview.get_selection()
+        # self.pkg_tree_selection.set_mode(Gtk.SelectionMode.NONE)
         # tree_selection.connect("clicked", self.selected_software)
         pkg_sw.add(self.pkgtreeview)
         # iconview = Gtk.IconView.new()
@@ -283,6 +397,7 @@ class TableWindow(Gtk.Window):
         self.table.attach(pkg_sw, 2, 10, 0, 12)
         self.show()
         return self.table
+
 
 TableWindow()
 Gtk.main()
