@@ -1,6 +1,6 @@
-#!/usr/local/bin/python3.6
+#!/usr/bin/env python3.6
 """
-Copyright (c) 2017, GhostBSD. All rights reserved.
+Copyright (c) 2017-2018, GhostBSD. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -36,7 +36,8 @@ import threading
 
 from pkgngHandler import search_packages, available_package_origin
 from pkgngHandler import available_package_dictionary, isntalled_package_origin
-from pkgngHandler import isntalled_package_dictionary
+from pkgngHandler import isntalled_package_dictionary, delete_package, fetch_package
+from pkgngHandler import install_package
 from xpm import xpmPackageCategory
 
 global pkg_to_install
@@ -65,28 +66,28 @@ class TableWindow(Gtk.Window):
         self.previousbutton.set_is_important(True)
         self.previousbutton.set_icon_name("go-previous")
         self.previousbutton.set_sensitive(False)
-        toolbar.insert(self.previousbutton, -1)
+        toolbar.insert(self.previousbutton, 1)
         self.nextbutton = Gtk.ToolButton()
         self.nextbutton.set_label("Forward")
         self.nextbutton.set_is_important(True)
         self.nextbutton.set_icon_name("go-next")
         self.nextbutton.set_sensitive(False)
-        toolbar.insert(self.nextbutton, -2)
+        toolbar.insert(self.nextbutton, 2)
 
         radiotoolbutton1 = Gtk.RadioToolButton(label="All Software")
-        radiotoolbutton1.set_icon_name("package_system")
+        radiotoolbutton1.set_icon_name("package_network")
         self.available_or_installed = 'available'
         radiotoolbutton1.connect("toggled", self.all_or_installed, "available")
-        toolbar.insert(radiotoolbutton1, -3)
+        toolbar.insert(radiotoolbutton1, 3)
         radiotoolbutton2 = Gtk.RadioToolButton(label="Installed Software",
                                                group=radiotoolbutton1)
         radiotoolbutton2.set_icon_name("system")
         radiotoolbutton2.connect("toggled", self.all_or_installed, "installed")
-        toolbar.insert(radiotoolbutton2, -4)
+        toolbar.insert(radiotoolbutton2, 4)
         separatortoolitem = Gtk.SeparatorToolItem()
-        toolbar.insert(separatortoolitem, -5)
+        toolbar.insert(separatortoolitem, 5)
         toolitem = Gtk.ToolItem()
-        toolbar.insert(toolitem, -6)
+        toolbar.insert(toolitem, 6)
         toolitem.set_expand(True)
         self.entry = Gtk.Entry()
         self.entry.set_icon_from_icon_name(Gtk.EntryIconPosition.PRIMARY,
@@ -98,44 +99,35 @@ class TableWindow(Gtk.Window):
         hBox.pack_start(self.entry, False, False, 0)
         self.apply_button = Gtk.Button()
         self.apply_button.set_label("Apply")
-        # self.apply_button.set_is_important(True)
-        # self.apply_button.set_stock_id('gtk-apply')
         apply_img = Gtk.Image()
         apply_img.set_from_icon_name('gtk-apply', 1)
         self.apply_button.set_image(apply_img)
         self.apply_button.set_property("tooltip-text", "Apply change on the system")
         self.apply_button.set_sensitive(False)
         hBox.pack_end(self.apply_button, False, False, 0)
-        # toolbar.insert(self.apply_button, -1)
         self.cancel_button = Gtk.Button()
         self.cancel_button.set_label("Cancel")
-        # self.cancel_button.set_is_important(True)
         cancel_img = Gtk.Image()
-        cancel_img.set_from_icon_name('gtk-apply', 1)
+        cancel_img.set_from_icon_name('gtk-cancel', 1)
         self.cancel_button.set_image(cancel_img)
         self.cancel_button.set_sensitive(False)
         self.cancel_button.set_property("tooltip-text", "Cancel changes")
         hBox.pack_end(self.cancel_button, False, False, 0)
-        # toolbar.insert(self.cancel_button, -2)
-
+        self.apply_button.connect("clicked", self.apply_change)
+        self.cancel_button.connect("clicked", self.cancel_change)
         # Creating a notebook to swith
         self.mainstack = Gtk.Stack()
         self.mainstack.show()
         self.mainstack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT)
         self.box1.pack_start(self.mainstack, True, True, 0)
-
         mainwin = self.MainBook()
         self.mainstack.add_named(mainwin, "mainwin")
-
-        # state = Gtk.Notebook()
-        # state.show()
-        self.pkg_statistic = Gtk.Label('adlk;fjalkdjfajdlkfj')
+        self.pkg_statistic = Gtk.Label()
         self.pkg_statistic.set_use_markup(True)
         self.pkg_statistic.set_xalign(0.0)
         self.progress = Gtk.ProgressBar()
         self.progress.set_show_text(True)
         grid = Gtk.Grid()
-        # grid.set_row_spacing(1)
         grid.set_column_spacing(10)
         grid.set_margin_left(10)
         grid.set_margin_right(10)
@@ -150,11 +142,81 @@ class TableWindow(Gtk.Window):
         self.show_all()
         self.initial_thread('initial')
 
+    def cancel_change(self, widget):
+        global pkg_to_uninstall
+        global pkg_to_install
+        pkg_to_install = []
+        pkg_to_uninstall = []
+        pkg_selection = self.pkgtreeview.get_selection()
+        (model, iter) = pkg_selection.get_selected()
+        try:
+            pkg_path = model.get_path(iter)
+        except KeyError:
+            nopath = True
+        else:
+            nopath = False
+        
+        try:
+            self.searchs
+        except AttributeError:
+            self.update_pkg_store()
+        else:
+            self.update_search()
+        if nopath is False:
+            self.pkgtreeview.set_cursor(pkg_path)
+        self.apply_button.set_sensitive(False)
+        self.cancel_button.set_sensitive(False)
+
+    def apply_change(self, widget):
+        # window to confirm installation and deleteing pkg
+
+        # adding threading to install and delete pkg
+        print('apply change')
+
+    def apply_package_change():
+        self.progress.show()
+        un_num = len(pkg_to_uninstall)
+        in_num = len(pkg_to_install)
+        num = un_num + (in_num * 2)
+
+        fraction = 0
+        encriment = 1.0 / num
+        for pkg in pkg_to_uninstall:
+            msg = f"Uninstalling {pkg}"
+            GLib.idle_add(self.update_progress, self.progress, fraction, msg)
+            dpkg = delete_package(pkg)
+            while 1:
+                line = dpkg.readline()
+                if not line:
+                    break
+                msg = line.rstrip()
+                GLib.idle_add(self.update_progress, self.progress, fraction, msg)
+
+        for pkg in pkg_to_install:
+            msg = f"Fetching {pkg}"
+            GLib.idle_add(self.update_progress, self.progress, fraction, msg)
+            dpkg = fetch_package(pkg)
+            while 1:
+                line = dpkg.readline()
+                if not line:
+                    break
+                msg = line.rstrip()
+                GLib.idle_add(self.update_progress, self.progress, fraction, msg)
+
+        for pkg in pkg_to_install:
+            msg = f"Installing {pkg}"
+            GLib.idle_add(self.update_progress, self.progress, fraction, msg)
+            dpkg = install_package(pkg)
+            while 1:
+                line = dpkg.readline()
+                if not line:
+                    break
+                msg = line.rstrip()
+                GLib.idle_add(self.update_progress, self.progress, fraction, msg)
+
     def all_or_installed(self, widget, data):
         if widget.get_active():
             self.available_or_installed = data
-            self.treeview.set_cursor(1)
-            self.treeview.set_cursor(0)
             if data == 'available':
                 avail = self.available_pkg['avail']
                 msg = "Packages available:"
@@ -165,6 +227,8 @@ class TableWindow(Gtk.Window):
                 msg = "Installed packages:"
                 self.pkg_statistic.set_text(f'<small>{msg} {installed}</small>')
                 self.pkg_statistic.set_use_markup(True)
+            self.entry.set_text('')
+            self.update_pkg_store()
             print(data)
 
     def sync_orgin(self):
@@ -179,47 +243,22 @@ class TableWindow(Gtk.Window):
         self.progress.set_fraction(fraction)
         self.progress.set_text(msg)
 
-    def sync_alvailable(self):
-        self.progress.show()
-        GLib.idle_add(self.update_progress, 0.4, 'store packages origin')
-        self.category_store_sync2()
-        # GObject.idle_add(self.category_store_sync2)
-        avail = self.available_pkg['avail']
-        msg = "Packages available:"
-        self.pkg_statistic.set_text(f'<small>{msg} {avail}</small>')
-        self.pkg_statistic.set_use_markup(True)
-        GLib.idle_add(self.update_progress, 0.7, 'Loading all packages')
-        # GObject.idle_add(self.store_all_pkgs)
-        self.store_all_pkgs()
-        GLib.idle_add(self.update_progress, 1.0, 'completed')
-        self.progress.hide()
-        GObject.idle_add(self.stop_tread)
-
-    def available_thread(self):
-        self.thr = threading.Thread(target=self.sync_alvailable, args=())
-        self.thr.setDaemon(True)
-        self.thr.start()
-
     def initial_sync(self):
         self.pkg_statistic.set_text('<small>Syncing statistic</small>')
         self.pkg_statistic.set_use_markup(True)
         self.progress.set_fraction(0.1)
         self.progress.set_text('syncing packages origins')
         self.sync_orgin()
-        self.progress.set_fraction(0.3)
+        self.progress.set_fraction(0.4)
         self.progress.set_text('syncing packages data')
         self.sync_packages()
-        self.progress.set_fraction(0.5)
+        self.progress.set_fraction(0.8)
         self.progress.set_text('store packages origin')
         self.category_store_sync()
         avail = self.available_pkg['avail']
         msg = "Packages available:"
         self.pkg_statistic.set_text(f'<small>{msg} {avail}</small>')
         self.pkg_statistic.set_use_markup(True)
-        # self.progress.show()
-        # self.progress.set_fraction(0.7)
-        # self.progress.set_text('Loading all packages')
-        # GObject.idle_add(self.store_all_pkgs)
         self.progress.set_fraction(1)
         self.progress.set_text('completed')
         self.progress.hide()
@@ -232,66 +271,72 @@ class TableWindow(Gtk.Window):
         self.thr = threading.Thread(target=self.initial_sync, args=())
         self.thr.setDaemon(True)
         self.thr.start()
-        # thr.join()
 
     def selected_software(self, view, event):
         selection = self.pkgtreeview.get_selection()
         (model, iter) = selection.get_selected()
         print(model[iter][1])
 
+    def search_release(self, widget, event):
+        self.searchs = widget.get_text()
+        if self.searchs == '':
+            self.update_pkg_store()
+        else:
+            self.update_search()
+
+    def update_search(self):
+        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 42, 0)
+        if len(self.searchs) > 1:
+            self.pkg_store.clear()
+            # xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
+            for pkg in search_packages(self.searchs):
+                version = self.available_pkg['all'][pkg]['version']
+                size = self.available_pkg['all'][pkg]['size']
+                if pkg in pkg_to_install:
+                    installed = True
+                elif pkg in pkg_to_uninstall:
+                    installed = False
+                else:
+                    installed = self.available_pkg['all'][pkg]['installed']
+                self.pkg_store.append([pixbuf, pkg, version, size, installed])
+
     def category_store_sync(self):
         self.store.clear()
+        self.entry.set_text('')
         for category in self.pkg_origin:
             xmp_data = xpmPackageCategory()[category]
             xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(xmp_data)
             self.store.append([xmp, category])
         self.treeview.set_cursor(0)
 
-    def store_all_pkgs(self):
-        self.pkg_store.clear()
-        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 42, 0)
-        pkg_d = self.available_pkg['all']
-        pkg_list = list(pkg_d.keys())
-        pkg_list.sort()
-        for pkg in pkg_list:
-            version = pkg_d[pkg]['version']
-            size = pkg_d[pkg]['size']
-            installed = pkg_d[pkg]['installed']
-            self.pkg_store.append([pixbuf, pkg, version, size, installed])
-
-    def search_release(self, widget, event):
-        searchs = widget.get_text()
-        print(searchs)
-        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 42, 0)
-        if len(searchs) > 1:
-            self.pkg_store.clear()
-            # xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
-            for pkg in search_packages(searchs):
-                version = self.available_pkg['all'][pkg]['version']
-                size = self.available_pkg['all'][pkg]['size']
-                installed = self.available_pkg['all'][pkg]['installed']
-                self.pkg_store.append([pixbuf, pkg, version, size, installed])
-
     def selection_category(self, tree_selection):
         (model, pathlist) = tree_selection.get_selected_rows()
-        self.pkg_store.clear()
         path = pathlist[0]
         tree_iter = model.get_iter(path)
-        value = model.get_value(tree_iter, 1)
+        self.categori = model.get_value(tree_iter, 1)
+        self.update_pkg_store()
+
+    def update_pkg_store(self):
+        self.pkg_store.clear()
         pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 42, 0)
         # xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
         if self.available_or_installed == 'available':
-            pkg_d = self.available_pkg[value]
+            pkg_d = self.available_pkg[self.categori]
         else:
             try:
-                pkg_d = self.installed_pkg[value]
+                pkg_d = self.installed_pkg[self.categori]
             except KeyError:
                 pkg_d = {}
         pkg_list = list(pkg_d.keys())
         for pkg in pkg_list:
             version = pkg_d[pkg]['version']
             size = pkg_d[pkg]['size']
-            installed = pkg_d[pkg]['installed']
+            if pkg in pkg_to_install:
+                installed = True
+            elif pkg in pkg_to_uninstall:
+                installed = False
+            else:
+                installed = pkg_d[pkg]['installed']
             self.pkg_store.append([pixbuf, pkg, version, size, installed])
 
     def add_and_rm_pkg(self, cell, path, model):

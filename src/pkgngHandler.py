@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3.6
+#!/usr/bin/env python3.6
 
 from subprocess import Popen, PIPE
 
@@ -95,3 +95,18 @@ def search_packages(search):
                    universal_newlines=True)
     lst = output.stdout.read().splitlines()
     return lst
+
+def delete_packages(pkg):
+    cmd = f"pkg delete -y {pkg}"
+    fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True)
+    return fetch.stdout
+
+def fetch_packages(pkg):
+    cmd = f"pkg fetch -y {pkg}"
+    fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True)
+    return fetch.stdout
+
+def install_packages(pkg):
+    cmd = f"pkg install -y {pkg}"
+    fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True)
+    return fetch.stdout
