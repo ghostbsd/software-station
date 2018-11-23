@@ -98,15 +98,18 @@ def search_packages(search):
 
 def delete_packages(pkg):
     cmd = f"pkg delete -y {pkg}"
-    fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True)
+    fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
+                  universal_newlines=True)
     return fetch.stdout
 
 def fetch_packages(pkg):
     cmd = f"pkg fetch -y {pkg}"
-    fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True)
+    fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
+                  universal_newlines=True)
     return fetch.stdout
 
 def install_packages(pkg):
     cmd = f"pkg install -y {pkg}"
-    fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True)
+    fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
+                  universal_newlines=True)
     return fetch.stdout

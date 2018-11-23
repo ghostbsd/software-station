@@ -32,12 +32,12 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GLib, GObject
 import threading
-# from time import sleep
+from time import sleep
 
 from pkgngHandler import search_packages, available_package_origin
 from pkgngHandler import available_package_dictionary, isntalled_package_origin
-from pkgngHandler import isntalled_package_dictionary, delete_package, fetch_package
-from pkgngHandler import install_package
+from pkgngHandler import isntalled_package_dictionary, delete_packages, fetch_packages
+from pkgngHandler import install_packages
 from xpm import xpmPackageCategory
 
 global pkg_to_install
@@ -169,50 +169,74 @@ class TableWindow(Gtk.Window):
 
     def apply_change(self, widget):
         # window to confirm installation and deleteing pkg
+        self.apply_thr = threading.Thread(target=self.apply_package_change, args=())
+        self.apply_thr.setDaemon(True)
+        self.apply_thr.start()
 
-        # adding threading to install and delete pkg
-        print('apply change')
+    def stop_apply_tread(self):
+        self.apply_thr.join()
 
-    def apply_package_change():
+    def apply_package_change(self):
         self.progress.show()
+        global pkg_to_uninstall
+        global pkg_to_install
         un_num = len(pkg_to_uninstall)
         in_num = len(pkg_to_install)
-        num = un_num + (in_num * 2)
+        num = un_num + (in_num * 2) + 1
 
         fraction = 0
         encriment = 1.0 / num
         for pkg in pkg_to_uninstall:
             msg = f"Uninstalling {pkg}"
             GLib.idle_add(self.update_progress, self.progress, fraction, msg)
-            dpkg = delete_package(pkg)
-            while 1:
+            dpkg = delete_packages(pkg)
+            while True:
                 line = dpkg.readline()
                 if not line:
                     break
                 msg = line.rstrip()
+                print(msg)
                 GLib.idle_add(self.update_progress, self.progress, fraction, msg)
+            fraction += encriment
 
         for pkg in pkg_to_install:
             msg = f"Fetching {pkg}"
             GLib.idle_add(self.update_progress, self.progress, fraction, msg)
-            dpkg = fetch_package(pkg)
-            while 1:
+            dpkg = fetch_packages(pkg)
+            while True:
                 line = dpkg.readline()
                 if not line:
                     break
                 msg = line.rstrip()
+                print(msg)
                 GLib.idle_add(self.update_progress, self.progress, fraction, msg)
+            fraction += encriment
 
         for pkg in pkg_to_install:
             msg = f"Installing {pkg}"
             GLib.idle_add(self.update_progress, self.progress, fraction, msg)
-            dpkg = install_package(pkg)
-            while 1:
+            dpkg = install_packages(pkg)
+            while True:
                 line = dpkg.readline()
                 if not line:
                     break
                 msg = line.rstrip()
+                print(msg)
                 GLib.idle_add(self.update_progress, self.progress, fraction, msg)
+            fraction += encriment
+        msg = 'Updating data'
+        GLib.idle_add(self.update_progress, self.progress, fraction, msg)
+        self.sync_packages()
+        pkg_to_install = []
+        pkg_to_uninstall = []
+        self.apply_button.set_sensitive(False)
+        self.cancel_button.set_sensitive(False)
+        fraction += encriment
+        msg = 'Completed'
+        GLib.idle_add(self.update_progress, self.progress, fraction, msg)
+        sleep(1)
+        self.progress.hide()
+        GObject.idle_add(self.stop_apply_tread)
 
     def all_or_installed(self, widget, data):
         if widget.get_active():
@@ -239,9 +263,9 @@ class TableWindow(Gtk.Window):
         self.installed_pkg = isntalled_package_dictionary(self.installed_origin)
         self.available_pkg = available_package_dictionary(self.pkg_origin)
 
-    def update_progress(self, fraction, msg):
-        self.progress.set_fraction(fraction)
-        self.progress.set_text(msg)
+    def update_progress(self, progress, fraction, msg):
+        progress.set_fraction(fraction)
+        progress.set_text(msg)
 
     def initial_sync(self):
         self.pkg_statistic.set_text('<small>Syncing statistic</small>')
