@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=Software Station
+Comment=Install and remove softwares
+Exec=sudo software-station
+Icon=system-software-install
+Terminal=false
+Type=Application
+Categories=System;Settings;
+StartupNotify=false

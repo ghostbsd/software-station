@@ -21,7 +21,7 @@ def available_package_list():
     return lst
 
 
-def isntalled_package_origin():
+def installed_package_origin():
     cmd = "pkg query '%o' | cut -d '/' -f1"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                     universal_newlines=True)
@@ -66,7 +66,7 @@ def available_package_dictionary(origin_list):
     return pkg_dict
 
 
-def isntalled_package_dictionary(origin_list):
+def installed_package_dictionary(origin_list):
     pkg_list = installed_package_list()
     avail = str(len(pkg_list))
     pkg_dict = {'avail': avail, 'all': {}}
@@ -96,17 +96,20 @@ def search_packages(search):
     lst = output.stdout.read().splitlines()
     return lst
 
+
 def delete_packages(pkg):
     cmd = f"pkg delete -y {pkg}"
     fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                   universal_newlines=True)
     return fetch.stdout
 
+
 def fetch_packages(pkg):
     cmd = f"pkg fetch -y {pkg}"
     fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                   universal_newlines=True)
     return fetch.stdout
+
 
 def install_packages(pkg):
     cmd = f"pkg install -y {pkg}"

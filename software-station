@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/local/bin/python3.6
 """
 Copyright (c) 2017-2018, GhostBSD. All rights reserved.
 
@@ -34,11 +34,12 @@ from gi.repository import Gtk, GdkPixbuf, GLib, GObject
 import threading
 from time import sleep
 
-from pkgngHandler import search_packages, available_package_origin
-from pkgngHandler import available_package_dictionary, isntalled_package_origin
-from pkgngHandler import isntalled_package_dictionary, delete_packages, fetch_packages
-from pkgngHandler import install_packages
-from xpm import xpmPackageCategory
+from software_station import search_packages, available_package_origin
+from software_station import available_package_dictionary
+from software_station import installed_package_origin
+from software_station import installed_package_dictionary, delete_packages
+from software_station import install_packages, fetch_packages
+from software_station_xpm import xpmPackageCategory
 
 global pkg_to_install
 pkg_to_install = []
@@ -155,7 +156,7 @@ class TableWindow(Gtk.Window):
             nopath = True
         else:
             nopath = False
-        
+
         try:
             self.searchs
         except AttributeError:
@@ -259,8 +260,8 @@ class TableWindow(Gtk.Window):
         self.pkg_origin = available_package_origin()
 
     def sync_packages(self):
-        self.installed_origin = isntalled_package_origin()
-        self.installed_pkg = isntalled_package_dictionary(self.installed_origin)
+        self.installed_origin = installed_package_origin()
+        self.installed_pkg = installed_package_dictionary(self.installed_origin)
         self.available_pkg = available_package_dictionary(self.pkg_origin)
 
     def update_progress(self, progress, fraction, msg):
