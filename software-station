@@ -271,21 +271,22 @@ class TableWindow(Gtk.Window):
     def initial_sync(self):
         self.pkg_statistic.set_text('<small>Syncing statistic</small>')
         self.pkg_statistic.set_use_markup(True)
-        self.progress.set_fraction(0.1)
-        self.progress.set_text('syncing packages origins')
+        msg = 'syncing packages origins'
+        GLib.idle_add(self.update_progress, self.progress, 0.1, msg)
         self.sync_orgin()
-        self.progress.set_fraction(0.4)
-        self.progress.set_text('syncing packages data')
+        msg = 'syncing packages data'
+        GLib.idle_add(self.update_progress, self.progress, 0.4, msg)
         self.sync_packages()
-        self.progress.set_fraction(0.8)
-        self.progress.set_text('store packages origin')
+        msg = 'store packages origin'
+        GLib.idle_add(self.update_progress, self.progress, 0.8, msg)
         self.category_store_sync()
         avail = self.available_pkg['avail']
         msg = "Packages available:"
         self.pkg_statistic.set_text(f'<small>{msg} {avail}</small>')
         self.pkg_statistic.set_use_markup(True)
-        self.progress.set_fraction(1)
-        self.progress.set_text('completed')
+        msg = 'Completed'
+        GLib.idle_add(self.update_progress, self.progress, 1.0,msg)
+        sleep(1)
         self.progress.hide()
         GObject.idle_add(self.stop_tread)
 
