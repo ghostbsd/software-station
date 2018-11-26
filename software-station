@@ -30,9 +30,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, GLib, GObject
+from gi.repository import Gtk, GdkPixbuf, GLib, GObject;
 import threading
+import crypt, pwd
+import os
 from time import sleep
+
 
 from software_station import search_packages, available_package_origin
 from software_station import available_package_dictionary
@@ -470,5 +473,33 @@ class TableWindow(Gtk.Window):
         return self.table
 
 
-TableWindow()
+class not_root(Gtk.Window):
+    def __init__(self):
+        Gtk.Window.__init__(self)
+        self.set_title("Software Station")
+        self.connect("delete-event", Gtk.main_quit)
+        self.set_size_request(200, 80)
+        box1 = Gtk.VBox(False, 0)
+        self.add(box1)
+        box1.show()
+        label = Gtk.Label('You need to be root')
+        box1.pack_start(label, True, True, 0)
+        hBox = Gtk.HBox(False, 0)
+        hBox.show()
+        box1.pack_end(hBox, False, False, 5)
+        ok_button = Gtk.Button()
+        ok_button.set_label("OK")
+        apply_img = Gtk.Image()
+        apply_img.set_from_icon_name('gtk-ok', 1)
+        ok_button.set_image(apply_img)
+        ok_button.connect("clicked", Gtk.main_quit)
+        hBox.pack_end(ok_button, False, False, 5)
+        self.show_all()
+
+
+if os.geteuid() == 0:
+    TableWindow()
+else:
+    not_root()
+
 Gtk.main()
