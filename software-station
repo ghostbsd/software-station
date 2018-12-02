@@ -508,7 +508,6 @@ class confirmation(Gtk.Window):
         else:
             Gtk.main_quit()
 
-
     def __init__(self, user):
         Gtk.Window.__init__(self)
         self.set_title("Software Station")
@@ -520,6 +519,7 @@ class confirmation(Gtk.Window):
         label = Gtk.Label(f'Confirm {user} password: ')
         vBox.pack_start(label, True, True, 5)
         self.passwd = Gtk.Entry()
+        self.passwd.set_visibility(False)
         self.passwd.connect("activate", self.confirm_passwd, user)
         hBox = Gtk.HBox(False, 0)
         hBox.show()
