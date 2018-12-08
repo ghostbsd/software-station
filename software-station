@@ -32,16 +32,17 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GLib, GObject
 import threading
-import crypt, pwd
+import crypt
+import pwd
 import os
 from time import sleep
 
 
-from software_station import search_packages, available_package_origin
-from software_station import available_package_dictionary
-from software_station import installed_package_origin
-from software_station import installed_package_dictionary, delete_packages
-from software_station import install_packages, fetch_packages
+from software_station_pkg import search_packages, available_package_origin
+from software_station_pkg import available_package_dictionary
+from software_station_pkg import installed_package_origin
+from software_station_pkg import installed_package_dictionary, delete_packages
+from software_station_pkg import install_packages, fetch_packages
 from software_station_xpm import xpmPackageCategory
 
 global pkg_to_install
@@ -321,13 +322,14 @@ class TableWindow(Gtk.Window):
             for pkg in search_packages(self.searchs):
                 version = self.available_pkg['all'][pkg]['version']
                 size = self.available_pkg['all'][pkg]['size']
+                comment = self.available_pkg['all'][pkg]['comment']
                 if pkg in pkg_to_install:
                     installed = True
                 elif pkg in pkg_to_uninstall:
                     installed = False
                 else:
                     installed = self.available_pkg['all'][pkg]['installed']
-                self.pkg_store.append([pixbuf, pkg, version, size, installed])
+                self.pkg_store.append([pixbuf, pkg, version, size, comment, installed])
 
     def category_store_sync(self):
         self.store.clear()
@@ -360,26 +362,27 @@ class TableWindow(Gtk.Window):
         for pkg in pkg_list:
             version = pkg_d[pkg]['version']
             size = pkg_d[pkg]['size']
+            comment = pkg_d[pkg]['comment']
             if pkg in pkg_to_install:
                 installed = True
             elif pkg in pkg_to_uninstall:
                 installed = False
             else:
                 installed = pkg_d[pkg]['installed']
-            self.pkg_store.append([pixbuf, pkg, version, size, installed])
+            self.pkg_store.append([pixbuf, pkg, version, size, comment, installed])
 
     def add_and_rm_pkg(self, cell, path, model):
-        model[path][4] = not model[path][4]
+        model[path][5] = not model[path][5]
         pkg = model[path][1]
         if pkg not in pkg_to_uninstall and pkg not in pkg_to_install:
-            if model[path][4] is False:
+            if model[path][5] is False:
                 pkg_to_uninstall.extend([pkg])
             else:
                 pkg_to_install.extend([pkg])
         else:
-            if pkg in pkg_to_uninstall and model[path][4] is True:
+            if pkg in pkg_to_uninstall and model[path][5] is True:
                 pkg_to_uninstall.remove(pkg)
-            elif pkg in pkg_to_install and model[path][4] is False:
+            elif pkg in pkg_to_install and model[path][5] is False:
                 pkg_to_install.remove(pkg)
         if pkg not in pkg_to_uninstall and pkg not in pkg_to_install:
             self.apply_button.set_sensitive(False)
@@ -420,7 +423,7 @@ class TableWindow(Gtk.Window):
         pkg_sw = Gtk.ScrolledWindow()
         pkg_sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         pkg_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        self.pkg_store = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str, bool)
+        self.pkg_store = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str, str, bool)
         self.pkgtreeview = Gtk.TreeView(self.pkg_store)
         self.pkgtreeview.set_model(self.pkg_store)
         self.pkgtreeview.set_rules_hint(True)
@@ -432,7 +435,7 @@ class TableWindow(Gtk.Window):
         self.check_cell.set_property('activatable', True)
         self.check_cell.connect('toggled', self.add_and_rm_pkg, self.pkg_store)
         check_column = Gtk.TreeViewColumn("Check", self.check_cell)
-        check_column.add_attribute(self.check_cell, "active", 4)
+        check_column.add_attribute(self.check_cell, "active", 5)
         self.pkgtreeview.append_column(check_column)
         pixbuf_cell = Gtk.CellRendererPixbuf()
         pixbuf_column = Gtk.TreeViewColumn('Icon', pixbuf_cell)
@@ -453,20 +456,12 @@ class TableWindow(Gtk.Window):
         size_column = Gtk.TreeViewColumn('Size', size_cell, text=3)
         size_column.set_sort_column_id(3)
         self.pkgtreeview.append_column(size_column)
-        # self.pkgtreeview.set_headers_visible(False)
+        self.pkgtreeview.set_tooltip_column(4)
         self.pkg_tree_selection = self.pkgtreeview.get_selection()
         # self.pkg_tree_selection.set_mode(Gtk.SelectionMode.NONE)
         # tree_selection.connect("clicked", self.selected_software)
         pkg_sw.add(self.pkgtreeview)
-        # iconview = Gtk.IconView.new()
-        # iconview.set_model(self.pkg_store)
-        # iconview.set_pixbuf_column(0)
-        # iconview.set_text_column(1)
-        # iconview.connect("item-activated", self.selected_software)
-        # iconview.set_tooltip_column(2)
-        # pkg_sw.add(iconview)
         pkg_sw.show()
-        # table.attach(toolbar, 0, 10, 0, 2)
         self.table.attach(category_sw, 0, 2, 0, 12)
         self.table.attach(pkg_sw, 2, 10, 0, 12)
         self.show()

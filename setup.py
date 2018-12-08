@@ -59,6 +59,6 @@ setup(name="software-station",
       package_dir={'': '.'},
       data_files=data_files,
       # install_requires = [ 'setuptools', ],
-      py_modules=["software_station", "software_station_xpm"],
+      py_modules=["software_station_pkg", "software_station_xpm"],
       scripts=['software-station'],)
 # cmdclass = cmdclass,
