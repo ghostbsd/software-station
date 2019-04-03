@@ -1,10 +1,10 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3.7
 
 from subprocess import Popen, PIPE
 
 
 def available_package_origin():
-    cmd = "pkg rquery '%o' | cut -d '/' -f1"
+    cmd = "pkgin search '%o' | cut -d '/' -f1"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                     universal_newlines=True)
     lst = list(set(pkg_out.stdout.read().splitlines()))
@@ -13,7 +13,7 @@ def available_package_origin():
 
 
 def available_package_list():
-    cmd = "pkg rquery '%o:%n:%v:%sh:%c'"
+    cmd = "pkgin avail '%o:%n:%v:%sh:%c'"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                     universal_newlines=True)
     lst = list(set(pkg_out.stdout.read().splitlines()))
@@ -22,7 +22,7 @@ def available_package_list():
 
 
 def installed_package_origin():
-    cmd = "pkg query '%o' | cut -d '/' -f1"
+    cmd = "pkgin list '%o' | cut -d '/' -f1"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                     universal_newlines=True)
     lst = list(set(pkg_out.stdout.read().splitlines()))
@@ -31,7 +31,7 @@ def installed_package_origin():
 
 
 def installed_package_list():
-    cmd = "pkg query '%o:%n:%v:%sh:%c'"
+    cmd = "pkgin list '%o:%n:%v:%sh:%c'"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                     universal_newlines=True)
     lst = list(set(pkg_out.stdout.read().splitlines()))
@@ -61,9 +61,8 @@ def available_package_dictionary(origin_list):
             'comment': pi[4],
             'installed': boolean
         }
-        pkg_dict[pl[0]].update({pi[1]: pkg_info})
-        pkg_dict['all'].update({pi[1]: pkg_info})
-    return pkg_dict
+       
+    return pkg_list
 
 
 def installed_package_dictionary(origin_list):
@@ -83,13 +82,12 @@ def installed_package_dictionary(origin_list):
             'comment': pi[4],
             'installed': True
         }
-        pkg_dict[pl[0]].update({pi[1]: pkg_info})
-        pkg_dict['all'].update({pi[1]: pkg_info})
-    return pkg_dict
+
+    return pkg_list
 
 
 def search_packages(search):
-    cmd = f"pkg search -Q name {search} | grep 'Name  ' | cut -d : -f2 | " \
+    cmd = f"pkgin search -Q name {search} | grep 'Name  ' | cut -d : -f2 | " \
         "cut -d ' ' -f2"
     output = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                    universal_newlines=True)
@@ -98,21 +96,21 @@ def search_packages(search):
 
 
 def delete_packages(pkg):
-    cmd = f"pkg delete -y {pkg}"
+    cmd = f"pkgin -y remove {pkg}"
     fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                   universal_newlines=True)
     return fetch.stdout
 
 
 def fetch_packages(pkg):
-    cmd = f"pkg fetch -y {pkg}"
+    cmd = f"pkgin -y install {pkg}"
     fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                   universal_newlines=True)
     return fetch.stdout
 
 
 def install_packages(pkg):
-    cmd = f"pkg install -y {pkg}"
+    cmd = f"pkgin -y install {pkg}"
     fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                   universal_newlines=True)
     return fetch.stdout
