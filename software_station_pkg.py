@@ -6,7 +6,7 @@ from subprocess import Popen, PIPE
 def available_package_origin():
     cmd = "pkg rquery '%o' | cut -d '/' -f1"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
-                    universal_newlines=True)
+                    universal_newlines=True, encoding='utf-8')
     lst = list(set(pkg_out.stdout.read().splitlines()))
     lst.sort()
     return lst
@@ -15,7 +15,7 @@ def available_package_origin():
 def available_package_list():
     cmd = "pkg rquery '%o:%n:%v:%sh:%c'"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
-                    universal_newlines=True)
+                    universal_newlines=True, encoding='utf-8')
     lst = list(set(pkg_out.stdout.read().splitlines()))
     lst.sort()
     return lst
@@ -24,7 +24,7 @@ def available_package_list():
 def installed_package_origin():
     cmd = "pkg query '%o' | cut -d '/' -f1"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
-                    universal_newlines=True)
+                    universal_newlines=True, encoding='utf-8')
     lst = list(set(pkg_out.stdout.read().splitlines()))
     lst.sort()
     return lst
@@ -33,7 +33,7 @@ def installed_package_origin():
 def installed_package_list():
     cmd = "pkg query '%o:%n:%v:%sh:%c'"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
-                    universal_newlines=True)
+                    universal_newlines=True, encoding='utf-8')
     lst = list(set(pkg_out.stdout.read().splitlines()))
     lst.sort()
     return lst
@@ -92,7 +92,7 @@ def search_packages(search):
     cmd = f"pkg search -Q name {search} | grep 'Name  ' | cut -d : -f2 | " \
         "cut -d ' ' -f2"
     output = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
-                   universal_newlines=True)
+                   universal_newlines=True, encoding='utf-8')
     lst = output.stdout.read().splitlines()
     return lst
 
@@ -100,19 +100,19 @@ def search_packages(search):
 def delete_packages(pkg):
     cmd = f"pkg delete -y {pkg}"
     fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
-                  universal_newlines=True)
+                  universal_newlines=True, encoding='utf-8')
     return fetch.stdout
 
 
 def fetch_packages(pkg):
     cmd = f"pkg fetch -y {pkg}"
     fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
-                  universal_newlines=True)
+                  universal_newlines=True, encoding='utf-8')
     return fetch.stdout
 
 
 def install_packages(pkg):
     cmd = f"pkg install -y {pkg}"
     fetch = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
-                  universal_newlines=True)
+                  universal_newlines=True, encoding='utf-8')
     return fetch.stdout
