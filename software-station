@@ -79,16 +79,20 @@ class TableWindow(Gtk.Window):
         self.nextbutton.set_sensitive(False)
         toolbar.insert(self.nextbutton, 2)
 
-        radiotoolbutton1 = Gtk.RadioToolButton(label="All Software")
-        radiotoolbutton1.set_icon_name("package_network")
+        self.available_toggle = Gtk.RadioToolButton(label="All Software")
+        self.available_toggle.set_icon_name("package_network")
         self.available_or_installed = 'available'
-        radiotoolbutton1.connect("toggled", self.all_or_installed, "available")
-        toolbar.insert(radiotoolbutton1, 3)
-        radiotoolbutton2 = Gtk.RadioToolButton(label="Installed Software",
-                                               group=radiotoolbutton1)
-        radiotoolbutton2.set_icon_name("system")
-        radiotoolbutton2.connect("toggled", self.all_or_installed, "installed")
-        toolbar.insert(radiotoolbutton2, 4)
+        self.available_toggle.connect("toggled", self.all_or_installed,
+                                      "available")
+        self.available_toggle.set_sensitive(False)
+        toolbar.insert(self.available_toggle, 3)
+        self.installed_toggle = Gtk.RadioToolButton(label="Installed Software",
+                                                group=self.available_toggle)
+        self.installed_toggle.set_icon_name("system")
+        self.installed_toggle.connect("toggled", self.all_or_installed,
+                                      "installed")
+        self.installed_toggle.set_sensitive(False)
+        toolbar.insert(self.installed_toggle, 4)
         separatortoolitem = Gtk.SeparatorToolItem()
         toolbar.insert(separatortoolitem, 5)
         toolitem = Gtk.ToolItem()
@@ -98,6 +102,8 @@ class TableWindow(Gtk.Window):
         self.entry.set_icon_from_icon_name(Gtk.EntryIconPosition.PRIMARY,
                                            "search")
         self.entry.connect("key-release-event", self.search_release)
+        self.entry.set_sensitive(False)
+        self.entry.set_visibility(False)
         hBox = Gtk.HBox(False, 0)
         toolitem.add(hBox)
         hBox.show()
@@ -107,7 +113,8 @@ class TableWindow(Gtk.Window):
         apply_img = Gtk.Image()
         apply_img.set_from_icon_name('gtk-apply', 1)
         self.apply_button.set_image(apply_img)
-        self.apply_button.set_property("tooltip-text", "Apply change on the system")
+        self.apply_button.set_property("tooltip-text",
+                                       "Apply change on the system")
         self.apply_button.set_sensitive(False)
         hBox.pack_end(self.apply_button, False, False, 0)
         self.cancel_button = Gtk.Button()
@@ -174,7 +181,8 @@ class TableWindow(Gtk.Window):
 
     def apply_change(self, widget):
         # window to confirm installation and deleteing pkg
-        self.apply_thr = threading.Thread(target=self.apply_package_change, args=())
+        self.apply_thr = threading.Thread(target=self.apply_package_change,
+                                          args=())
         self.apply_thr.setDaemon(True)
         self.apply_thr.start()
 
@@ -293,6 +301,10 @@ class TableWindow(Gtk.Window):
         sleep(1)
         self.progress.hide()
         GObject.idle_add(self.stop_tread)
+        self.entry.set_sensitive(True)
+        self.entry.set_visibility(True)
+        self.available_toggle.set_sensitive(True)
+        self.installed_toggle.set_sensitive(True)
 
     def stop_tread(self):
         self.thr.join()
