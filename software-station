@@ -127,7 +127,7 @@ class TableWindow(Gtk.Window):
         hBox.pack_end(self.cancel_button, False, False, 0)
         self.apply_button.connect("clicked", self.apply_change)
         self.cancel_button.connect("clicked", self.cancel_change)
-        # Creating a notebook to swith
+        # Creating a notebook to switch
         self.mainstack = Gtk.Stack()
         self.mainstack.show()
         self.mainstack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT)
@@ -180,7 +180,9 @@ class TableWindow(Gtk.Window):
         self.cancel_button.set_sensitive(False)
 
     def apply_change(self, widget):
-        # window to confirm installation and deleteing pkg
+        # window to confirm installation and deleting pkg
+        self.apply_button.set_sensitive(False)
+        self.cancel_button.set_sensitive(False)
         self.apply_thr = threading.Thread(target=self.apply_package_change,
                                           args=())
         self.apply_thr.setDaemon(True)
