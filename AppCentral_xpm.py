@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/pkg/bin/env python3.6
 
 
 def xpmPackageCategory():

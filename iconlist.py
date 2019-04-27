@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/pkg/bin/env python3.6
 
 from gi.repository import Gtk
 from gi.repository.GdkPixbuf import Pixbuf
@@ -6,7 +6,7 @@ import glob
 import os
 import sys
 
-found = glob.glob('/usr/local/share/icons/mate/24x24/*/*png')
+found = glob.glob('/usr/pkg/share/icons/mate/24x24/*/*png')
 
 icons = []
 
@@ -24,7 +24,7 @@ class IconViewWindow(Gtk.Window):
     def __init__(self):
 
         Gtk.Window.__init__(self)
-        self.set_title("%d icon%c - %s" % (len(icons), '' if len(icons) < 2 else 's', 'usr/local/share/icons/mate/24x24/'))
+        self.set_title("%d icon%c - %s" % (len(icons), '' if len(icons) < 2 else 's', 'usr/pkg/share/icons/mate/24x24/'))
         self.set_default_size(660, 400)
 
         liststore = Gtk.ListStore(Pixbuf, str, str)

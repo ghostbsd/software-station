@@ -1,6 +1,8 @@
-#!/usr/local/bin/python3.6
+#!/usr/pkg/bin/python3.6
 """
 Copyright (c) 2017-2018, GhostBSD. All rights reserved.
+
+Forked for OS108
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -38,12 +40,12 @@ import os
 from time import sleep
 
 
-from software_station_pkg import search_packages, available_package_origin
-from software_station_pkg import available_package_dictionary
-from software_station_pkg import installed_package_origin
-from software_station_pkg import installed_package_dictionary, delete_packages
-from software_station_pkg import install_packages, fetch_packages
-from software_station_xpm import xpmPackageCategory
+from AppCentral_pkg import search_packages, available_package_origin
+from AppCentral_pkg import available_package_dictionary
+from AppCentral_pkg import installed_package_origin
+from AppCentral_pkg import installed_package_dictionary, delete_packages
+from AppCentral_pkg import install_packages, fetch_packages
+from AppCentral_xpm import xpmPackageCategory
 
 global pkg_to_install
 pkg_to_install = []
@@ -56,7 +58,7 @@ class TableWindow(Gtk.Window):
 
     def __init__(self):
         Gtk.Window.__init__(self)
-        self.set_title("Software Station")
+        self.set_title("AppCentral")
         self.connect("delete-event", Gtk.main_quit)
         self.set_size_request(850, 500)
         # Creating the toolbar
@@ -471,7 +473,7 @@ class TableWindow(Gtk.Window):
 class not_root(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self)
-        self.set_title("Software Station")
+        self.set_title("AppCentral")
         self.connect("delete-event", Gtk.main_quit)
         self.set_size_request(200, 80)
         box1 = Gtk.VBox(False, 0)

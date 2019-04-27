@@ -1,8 +1,8 @@
 #!/usr/bin/env xdg-open
 [Desktop Entry]
-Name=Software Station
+Name=AppCentral
 Comment=Install and remove softwares
-Exec=sudo software-station
+Exec=sudo AppCentral
 Icon=system-software-install
 Terminal=false
 Type=Application
