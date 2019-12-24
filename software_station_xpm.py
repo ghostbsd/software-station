@@ -2502,8 +2502,8 @@ def xpmPackageCategory():
             "          F.G.H.:.>.>.:.g.I.J.          ",
             "              K. .;. .L.M.N.            ",
             "                                        "
-            ],
-            "comms": [
+        ],
+        "comms": [
             "20 20 74 1",
             " 	c None",
             ".	c #00AA10",
@@ -6027,8 +6027,8 @@ def xpmPackageCategory():
             "                4.5.6.                  ",
             "                                        ",
             "                                        "
-            ],
-            "korean": [
+        ],
+        "korean": [
             "20 20 184 2",
             "  	c None",
             ". 	c #DCDBDB",
@@ -7362,6 +7362,7 @@ def xpmPackageCategory():
             "  U.V.W.X.Y.Y.Z.`.N. +    .+++@+#+$+%+  ",
             "        &+*+*+=+-+          ;+>+,+'+    ",
             "        )+!+!+~+{+                      ",
+            "                                        ",
             "                                        "
         ],
         "net": [
