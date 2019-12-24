@@ -496,7 +496,7 @@ class not_root(Gtk.Window):
         box1 = Gtk.VBox(homogeneous=False, spacing=0)
         self.add(box1)
         box1.show()
-        label = Gtk.Label('You need to be root')
+        label = Gtk.Label(label='You need to be root')
         box1.pack_start(label, True, True, 0)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
