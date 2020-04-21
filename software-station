@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3.6
+#!/usr/local/bin/python3.7
 """
 Copyright (c) 2017-2018, GhostBSD. All rights reserved.
 
@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, GLib, GObject
+from gi.repository import Gtk, GdkPixbuf, GLib, GObject, Gdk
 import threading
 import crypt
 import pwd
@@ -139,6 +139,16 @@ class TableWindow(Gtk.Window):
         self.pkg_statistic.set_xalign(0.0)
         self.progress = Gtk.ProgressBar()
         self.progress.set_show_text(True)
+        css = b'''
+                progressbar > trough > progress {
+                background-color: green;
+                }
+        '''
+        css_provider = Gtk.CssProvider()
+        css_provider.load_from_data(css)
+        context = Gtk.StyleContext()
+        screen = Gdk.Screen.get_default()
+        context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         grid = Gtk.Grid()
         grid.set_column_spacing(10)
         grid.set_margin_start(10)
