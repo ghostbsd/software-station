@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, GLib, GObject, Gdk
+from gi.repository import Gtk, GdkPixbuf, GLib, Gdk
 import threading
 import crypt
 import pwd
@@ -80,17 +80,16 @@ class TableWindow(Gtk.Window):
         toolbar.insert(self.nextbutton, 2)
 
         self.available_toggle = Gtk.RadioToolButton(label="All Software")
+        self.available_toggle.set_property("tooltip-text", "All Software")
         self.available_toggle.set_icon_name("package_network")
         self.available_or_installed = 'available'
-        self.available_toggle.connect("toggled", self.all_or_installed,
-                                      "available")
+        self.available_toggle.connect("toggled", self.all_or_installed, "available")
         self.available_toggle.set_sensitive(False)
         toolbar.insert(self.available_toggle, 3)
-        self.installed_toggle = Gtk.RadioToolButton(label="Installed Software",
-                                                group=self.available_toggle)
+        self.installed_toggle = Gtk.RadioToolButton(label="Installed Software", group=self.available_toggle)
+        self.installed_toggle.set_property("tooltip-text", "Installed Software")
         self.installed_toggle.set_icon_name("system")
-        self.installed_toggle.connect("toggled", self.all_or_installed,
-                                      "installed")
+        self.installed_toggle.connect("toggled", self.all_or_installed, "installed")
         self.installed_toggle.set_sensitive(False)
         toolbar.insert(self.installed_toggle, 4)
         separatortoolitem = Gtk.SeparatorToolItem()
@@ -99,9 +98,9 @@ class TableWindow(Gtk.Window):
         toolbar.insert(toolitem, 6)
         toolitem.set_expand(True)
         self.entry = Gtk.Entry()
-        self.entry.set_icon_from_icon_name(Gtk.EntryIconPosition.PRIMARY,
-                                           "search")
+        self.entry.set_icon_from_icon_name(Gtk.EntryIconPosition.PRIMARY, "search")
         self.entry.connect("key-release-event", self.search_release)
+        self.entry.set_property("tooltip-text", "Search Software")
         self.entry.set_sensitive(False)
         self.entry.set_visibility(False)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
@@ -113,8 +112,7 @@ class TableWindow(Gtk.Window):
         apply_img = Gtk.Image()
         apply_img.set_from_icon_name('gtk-apply', 1)
         self.apply_button.set_image(apply_img)
-        self.apply_button.set_property("tooltip-text",
-                                       "Apply change on the system")
+        self.apply_button.set_property("tooltip-text", "Apply change on the system")
         self.apply_button.set_sensitive(False)
         hBox.pack_end(self.apply_button, False, False, 0)
         self.cancel_button = Gtk.Button()
@@ -309,7 +307,7 @@ class TableWindow(Gtk.Window):
         self.pkg_statistic.set_text(f'<small>{msg} {avail}</small>')
         self.pkg_statistic.set_use_markup(True)
         msg = 'Completed'
-        GLib.idle_add(self.update_progress, self.progress, 1.0,msg)
+        GLib.idle_add(self.update_progress, self.progress, 1.0, msg)
         sleep(1)
         self.progress.hide()
         GLib.idle_add(self.stop_tread)
@@ -485,7 +483,7 @@ class TableWindow(Gtk.Window):
         comment_column = Gtk.TreeViewColumn('Comment', comment_cell, text=4)
         comment_column.set_sort_column_id(4)
         self.pkgtreeview.append_column(comment_column)
-        self.pkgtreeview.set_tooltip_column(5)
+        self.pkgtreeview.set_tooltip_column(4)
         self.pkg_tree_selection = self.pkgtreeview.get_selection()
         # self.pkg_tree_selection.set_mode(Gtk.SelectionMode.NONE)
         # tree_selection.connect("clicked", self.selected_software)
