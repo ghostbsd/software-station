@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, GLib, GObject, Gdk
+from gi.repository import Gtk, GdkPixbuf, GLib, Gdk
 import threading
 import crypt
 import pwd
@@ -80,17 +80,16 @@ class TableWindow(Gtk.Window):
         toolbar.insert(self.nextbutton, 2)
 
         self.available_toggle = Gtk.RadioToolButton(label="All Software")
+        self.available_toggle.set_property("tooltip-text", "All Software")
         self.available_toggle.set_icon_name("package_network")
         self.available_or_installed = 'available'
-        self.available_toggle.connect("toggled", self.all_or_installed,
-                                      "available")
+        self.available_toggle.connect("toggled", self.all_or_installed, "available")
         self.available_toggle.set_sensitive(False)
         toolbar.insert(self.available_toggle, 3)
-        self.installed_toggle = Gtk.RadioToolButton(label="Installed Software",
-                                                group=self.available_toggle)
+        self.installed_toggle = Gtk.RadioToolButton(label="Installed Software", group=self.available_toggle)
+        self.installed_toggle.set_property("tooltip-text", "Installed Software")
         self.installed_toggle.set_icon_name("system")
-        self.installed_toggle.connect("toggled", self.all_or_installed,
-                                      "installed")
+        self.installed_toggle.connect("toggled", self.all_or_installed, "installed")
         self.installed_toggle.set_sensitive(False)
         toolbar.insert(self.installed_toggle, 4)
         separatortoolitem = Gtk.SeparatorToolItem()
@@ -99,11 +98,10 @@ class TableWindow(Gtk.Window):
         toolbar.insert(toolitem, 6)
         toolitem.set_expand(True)
         self.entry = Gtk.Entry()
-        self.entry.set_icon_from_icon_name(Gtk.EntryIconPosition.PRIMARY,
-                                           "search")
+        self.entry.set_icon_from_icon_name(Gtk.EntryIconPosition.PRIMARY, "search")
         self.entry.connect("key-release-event", self.search_release)
+        self.entry.set_property("tooltip-text", "Search Software")
         self.entry.set_sensitive(False)
-        self.entry.set_visibility(False)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         toolitem.add(hBox)
         hBox.show()
@@ -113,8 +111,7 @@ class TableWindow(Gtk.Window):
         apply_img = Gtk.Image()
         apply_img.set_from_icon_name('gtk-apply', 1)
         self.apply_button.set_image(apply_img)
-        self.apply_button.set_property("tooltip-text",
-                                       "Apply change on the system")
+        self.apply_button.set_property("tooltip-text", "Apply change on the system")
         self.apply_button.set_sensitive(False)
         hBox.pack_end(self.apply_button, False, False, 0)
         self.cancel_button = Gtk.Button()
@@ -193,6 +190,7 @@ class TableWindow(Gtk.Window):
         # window to confirm installation and deleting pkg
         self.apply_button.set_sensitive(False)
         self.cancel_button.set_sensitive(False)
+        self.lock_ui()
         self.apply_thr = threading.Thread(target=self.apply_package_change,
                                           args=())
         self.apply_thr.setDaemon(True)
@@ -262,6 +260,7 @@ class TableWindow(Gtk.Window):
         sleep(1)
         self.progress.hide()
         GLib.idle_add(self.stop_apply_tread)
+        self.unlock_ui()
 
     def all_or_installed(self, widget, data):
         if widget.get_active():
@@ -309,14 +308,25 @@ class TableWindow(Gtk.Window):
         self.pkg_statistic.set_text(f'<small>{msg} {avail}</small>')
         self.pkg_statistic.set_use_markup(True)
         msg = 'Completed'
-        GLib.idle_add(self.update_progress, self.progress, 1.0,msg)
+        GLib.idle_add(self.update_progress, self.progress, 1.0, msg)
         sleep(1)
         self.progress.hide()
         GLib.idle_add(self.stop_tread)
+        self.unlock_ui()
+
+    def unlock_ui(self):
         self.entry.set_sensitive(True)
-        self.entry.set_visibility(True)
         self.available_toggle.set_sensitive(True)
         self.installed_toggle.set_sensitive(True)
+        self.origin_treeview.set_sensitive(True)
+        self.pkgtreeview.set_sensitive(True)
+
+    def lock_ui(self):
+        self.entry.set_sensitive(False)
+        self.available_toggle.set_sensitive(False)
+        self.installed_toggle.set_sensitive(False)
+        self.origin_treeview.set_sensitive(False)
+        self.pkgtreeview.set_sensitive(False)
 
     def stop_tread(self):
         self.thr.join()
@@ -362,7 +372,7 @@ class TableWindow(Gtk.Window):
             xmp_data = xpmPackageCategory()[category]
             xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(xmp_data)
             self.store.append([xmp, category])
-        self.treeview.set_cursor(0)
+        self.origin_treeview.set_cursor(0)
 
     def selection_category(self, tree_selection):
         (model, pathlist) = tree_selection.get_selected_rows()
@@ -425,23 +435,24 @@ class TableWindow(Gtk.Window):
         category_sw.set_policy(Gtk.PolicyType.AUTOMATIC,
                                Gtk.PolicyType.AUTOMATIC)
         self.store = Gtk.ListStore(GdkPixbuf.Pixbuf, str)
-        self.treeview = Gtk.TreeView()
-        self.treeview.set_model(self.store)
-        # self.treeview.set_rules_hint(True)
+        self.origin_treeview = Gtk.TreeView()
+        self.origin_treeview.set_model(self.store)
+        # self.origin_treeview.set_rules_hint(True)
         cell = Gtk.CellRendererPixbuf()
         column = Gtk.TreeViewColumn("Pixbuf", cell)
         column.add_attribute(cell, "pixbuf", 0)
-        self.treeview.append_column(column)
+        self.origin_treeview.append_column(column)
         cell2 = Gtk.CellRendererText()
         column2 = Gtk.TreeViewColumn(None, cell2, text=0)
         column2.set_attributes(cell2, text=1)
-        self.treeview.append_column(column2)
-        self.treeview.set_reorderable(True)
-        self.treeview.set_headers_visible(False)
-        self.category_tree_selection = self.treeview.get_selection()
+        self.origin_treeview.append_column(column2)
+        self.origin_treeview.set_reorderable(True)
+        self.origin_treeview.set_headers_visible(False)
+        self.category_tree_selection = self.origin_treeview.get_selection()
         self.category_tree_selection.set_mode(Gtk.SelectionMode.SINGLE)
         self.category_tree_selection.connect("changed", self.selection_category)
-        category_sw.add(self.treeview)
+        self.origin_treeview.set_sensitive(False)
+        category_sw.add(self.origin_treeview)
         category_sw.show()
 
         pkg_sw = Gtk.ScrolledWindow()
@@ -485,10 +496,11 @@ class TableWindow(Gtk.Window):
         comment_column = Gtk.TreeViewColumn('Comment', comment_cell, text=4)
         comment_column.set_sort_column_id(4)
         self.pkgtreeview.append_column(comment_column)
-        self.pkgtreeview.set_tooltip_column(5)
+        self.pkgtreeview.set_tooltip_column(4)
         self.pkg_tree_selection = self.pkgtreeview.get_selection()
         # self.pkg_tree_selection.set_mode(Gtk.SelectionMode.NONE)
         # tree_selection.connect("clicked", self.selected_software)
+        self.pkgtreeview.set_sensitive(False)
         pkg_sw.add(self.pkgtreeview)
         pkg_sw.show()
         self.table.attach(category_sw, 0, 2, 0, 12)
