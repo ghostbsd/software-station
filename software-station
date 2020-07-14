@@ -351,6 +351,7 @@ class TableWindow(Gtk.Window):
     def update_search(self):
         pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 42, 0)
         if len(self.searchs) > 1:
+            self.category_tree_selection.unselect_all()
             self.pkg_store.clear()
             # xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
             for pkg in search_packages(self.searchs):
@@ -376,11 +377,12 @@ class TableWindow(Gtk.Window):
 
     def selection_category(self, tree_selection):
         (model, pathlist) = tree_selection.get_selected_rows()
-        path = pathlist[0]
-        tree_iter = model.get_iter(path)
-        self.categori = model.get_value(tree_iter, 1)
-        self.search_entry.set_text('')
-        self.update_pkg_store()
+        if pathlist:
+            path = pathlist[0]
+            tree_iter = model.get_iter(path)
+            self.categori = model.get_value(tree_iter, 1)
+            self.search_entry.set_text('')
+            self.update_pkg_store()
 
     def update_pkg_store(self):
         self.pkg_store.clear()
