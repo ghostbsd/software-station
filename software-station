@@ -97,15 +97,15 @@ class TableWindow(Gtk.Window):
         toolitem = Gtk.ToolItem()
         toolbar.insert(toolitem, 6)
         toolitem.set_expand(True)
-        self.entry = Gtk.Entry()
-        self.entry.set_icon_from_icon_name(Gtk.EntryIconPosition.PRIMARY, "search")
-        self.entry.connect("key-release-event", self.search_release)
-        self.entry.set_property("tooltip-text", "Search Software")
-        self.entry.set_sensitive(False)
+        self.search_entry = Gtk.Entry()
+        self.search_entry.set_icon_from_icon_name(Gtk.EntryIconPosition.PRIMARY, "search")
+        self.search_entry.connect("key-release-event", self.search_release)
+        self.search_entry.set_property("tooltip-text", "Search Software")
+        self.search_entry.set_sensitive(False)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         toolitem.add(hBox)
         hBox.show()
-        hBox.pack_start(self.entry, False, False, 0)
+        hBox.pack_start(self.search_entry, False, False, 0)
         self.apply_button = Gtk.Button()
         self.apply_button.set_label("Apply")
         apply_img = Gtk.Image()
@@ -275,7 +275,7 @@ class TableWindow(Gtk.Window):
                 msg = "Installed packages:"
                 self.pkg_statistic.set_text(f'<small>{msg} {installed}</small>')
                 self.pkg_statistic.set_use_markup(True)
-            self.entry.set_text('')
+            self.search_entry.set_text('')
             self.update_pkg_store()
             print(data)
 
@@ -315,14 +315,14 @@ class TableWindow(Gtk.Window):
         self.unlock_ui()
 
     def unlock_ui(self):
-        self.entry.set_sensitive(True)
+        self.search_entry.set_sensitive(True)
         self.available_toggle.set_sensitive(True)
         self.installed_toggle.set_sensitive(True)
         self.origin_treeview.set_sensitive(True)
         self.pkgtreeview.set_sensitive(True)
 
     def lock_ui(self):
-        self.entry.set_sensitive(False)
+        self.search_entry.set_sensitive(False)
         self.available_toggle.set_sensitive(False)
         self.installed_toggle.set_sensitive(False)
         self.origin_treeview.set_sensitive(False)
@@ -351,6 +351,7 @@ class TableWindow(Gtk.Window):
     def update_search(self):
         pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 42, 0)
         if len(self.searchs) > 1:
+            self.category_tree_selection.unselect_all()
             self.pkg_store.clear()
             # xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(softwareXpm())
             for pkg in search_packages(self.searchs):
@@ -367,7 +368,7 @@ class TableWindow(Gtk.Window):
 
     def category_store_sync(self):
         self.store.clear()
-        self.entry.set_text('')
+        self.search_entry.set_text('')
         for category in self.pkg_origin:
             xmp_data = xpmPackageCategory()[category]
             xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(xmp_data)
@@ -376,10 +377,12 @@ class TableWindow(Gtk.Window):
 
     def selection_category(self, tree_selection):
         (model, pathlist) = tree_selection.get_selected_rows()
-        path = pathlist[0]
-        tree_iter = model.get_iter(path)
-        self.categori = model.get_value(tree_iter, 1)
-        self.update_pkg_store()
+        if pathlist:
+            path = pathlist[0]
+            tree_iter = model.get_iter(path)
+            self.categori = model.get_value(tree_iter, 1)
+            self.search_entry.set_text('')
+            self.update_pkg_store()
 
     def update_pkg_store(self):
         self.pkg_store.clear()
@@ -428,7 +431,7 @@ class TableWindow(Gtk.Window):
         print('package to uninstall', pkg_to_uninstall)
 
     def MainBook(self):
-        self.table = Gtk.Table(n_rows=12, n_columns=10, homogeneous=True)
+        self.table = Gtk.Table(n_rows=12, n_columns=12, homogeneous=True)
         self.table.show_all()
         category_sw = Gtk.ScrolledWindow()
         category_sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
@@ -464,37 +467,42 @@ class TableWindow(Gtk.Window):
         # self.pkgtreeview.set_rules_hint(True)
         # self.pkgtreeview.connect_after("button_press_event",
         #                                self.selected_software)
-        self.pkgtreeview.connect_after("button_press_event",
-                                       self.selected_software)
+        self.pkgtreeview.connect_after("button_press_event", self.selected_software)
         self.check_cell = Gtk.CellRendererToggle()
         self.check_cell.set_property('activatable', True)
         self.check_cell.connect('toggled', self.add_and_rm_pkg, self.pkg_store)
         check_column = Gtk.TreeViewColumn("Check", self.check_cell)
         check_column.add_attribute(self.check_cell, "active", 5)
+        check_column.set_resizable(True)
         self.pkgtreeview.append_column(check_column)
         pixbuf_cell = Gtk.CellRendererPixbuf()
         pixbuf_column = Gtk.TreeViewColumn('Icon', pixbuf_cell)
         pixbuf_column.add_attribute(pixbuf_cell, "pixbuf", 0)
+        pixbuf_column.set_resizable(True)
         self.pkgtreeview.append_column(pixbuf_column)
         name_cell = Gtk.CellRendererText()
         name_column = Gtk.TreeViewColumn('Package Name', name_cell, text=1)
         # name_column.set_sizing(Gtk.TREE_VIEW_COLUMN_AUTOSIZE)
-        name_column.set_fixed_width(250)
+        name_column.set_fixed_width(150)
         name_column.set_sort_column_id(1)
+        name_column.set_resizable(True)
         self.pkgtreeview.append_column(name_column)
         version_cell = Gtk.CellRendererText()
         version_column = Gtk.TreeViewColumn('Version', version_cell, text=2)
-        version_column.set_fixed_width(150)
+        version_column.set_fixed_width(100)
         version_column.set_sort_column_id(2)
+        version_column.set_resizable(True)
         self.pkgtreeview.append_column(version_column)
         size_cell = Gtk.CellRendererText()
         size_column = Gtk.TreeViewColumn('Size', size_cell, text=3)
-        size_column.set_fixed_width(150)
+        size_column.set_fixed_width(100)
         size_column.set_sort_column_id(3)
-        self.pkgtreeview.append_column(size_column)
+        size_column.set_resizable(True)
+        # self.pkgtreeview.append_column(size_column)
         comment_cell = Gtk.CellRendererText()
         comment_column = Gtk.TreeViewColumn('Comment', comment_cell, text=4)
         comment_column.set_sort_column_id(4)
+        comment_column.set_resizable(True)
         self.pkgtreeview.append_column(comment_column)
         self.pkgtreeview.set_tooltip_column(4)
         self.pkg_tree_selection = self.pkgtreeview.get_selection()
@@ -504,7 +512,7 @@ class TableWindow(Gtk.Window):
         pkg_sw.add(self.pkgtreeview)
         pkg_sw.show()
         self.table.attach(category_sw, 0, 2, 0, 12)
-        self.table.attach(pkg_sw, 2, 10, 0, 12)
+        self.table.attach(pkg_sw, 2, 12, 0, 12)
         self.show()
         return self.table
 
