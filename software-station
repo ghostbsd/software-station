@@ -39,7 +39,7 @@ from time import sleep
 
 
 from software_station_pkg import search_packages, available_package_origin
-from software_station_pkg import available_package_dictionary
+from software_station_pkg import available_package_dictionary, get_pkg_changes_data
 from software_station_pkg import installed_package_origin
 from software_station_pkg import installed_package_dictionary, delete_packages
 from software_station_pkg import install_packages, fetch_packages
@@ -59,6 +59,7 @@ class TableWindow(Gtk.Window):
         self.set_title("Software Station")
         self.connect("delete-event", Gtk.main_quit)
         self.set_size_request(850, 500)
+        self.set_default_icon_name('system-software-install')
         # Creating the toolbar
         toolbar = Gtk.Toolbar()
         # toolbar.set_style(Gtk.ToolbarStyle.BOTH)
@@ -122,7 +123,7 @@ class TableWindow(Gtk.Window):
         self.cancel_button.set_sensitive(False)
         self.cancel_button.set_property("tooltip-text", "Cancel changes")
         hBox.pack_end(self.cancel_button, False, False, 0)
-        self.apply_button.connect("clicked", self.apply_change)
+        self.apply_button.connect("clicked", self.confirm_packages)
         self.cancel_button.connect("clicked", self.cancel_change)
         # Creating a notebook to switch
         self.mainstack = Gtk.Stack()
@@ -187,10 +188,7 @@ class TableWindow(Gtk.Window):
         self.cancel_button.set_sensitive(False)
 
     def apply_change(self, widget):
-        # window to confirm installation and deleting pkg
-        self.apply_button.set_sensitive(False)
-        self.cancel_button.set_sensitive(False)
-        self.lock_ui()
+        self.confirm_window.hide()
         self.apply_thr = threading.Thread(target=self.apply_package_change,
                                           args=())
         self.apply_thr.setDaemon(True)
@@ -515,6 +513,111 @@ class TableWindow(Gtk.Window):
         self.table.attach(pkg_sw, 2, 12, 0, 12)
         self.show()
         return self.table
+
+    def hidewindow(self, widget):
+        self.confirm_window.hide()
+        self.cancel_change(None)
+        self.unlock_ui()
+
+    def delete_event(self, widget):
+        # don't delete; hide instead
+        self.confirm_window.hide_on_delete()
+
+    def create_bbox(self):
+        table = Gtk.Table(n_rows=1, n_columns=2, homogeneous=False, column_spacing=5)
+        img = Gtk.Image(icon_name='gtk-cancel')
+        Close_button = Gtk.Button(label="Cancel")
+        Close_button.set_image(img)
+        table.attach(Close_button, 0, 1, 0, 1)
+        Close_button.connect("clicked", self.hidewindow)
+        confirm_button = Gtk.Button(label="Confirm")
+        table.attach(confirm_button, 1, 2, 0, 1)
+        confirm_button.connect("clicked", self.apply_change)
+        return table
+
+    def confirm_packages(self, widget):
+        self.apply_button.set_sensitive(False)
+        self.cancel_button.set_sensitive(False)
+        self.lock_ui()
+        self.confirm_window = Gtk.Window()
+        self.confirm_window.connect("destroy", self.delete_event)
+        self.confirm_window.set_size_request(600, 300)
+        self.confirm_window.set_keep_above(True)
+        # self.confirm_window.set_resizable(False)
+        self.confirm_window.set_title("Confirm software changes")
+        self.confirm_window.set_border_width(0)
+        self.confirm_window.set_position(Gtk.WindowPosition.CENTER)
+        self.confirm_window.set_default_icon_name('system-software-install')
+        box1 = Gtk.VBox(homogeneous=False, spacing=0)
+        self.confirm_window.add(box1)
+        box1.show()
+        box2 = Gtk.VBox(homogeneous=False, spacing=0)
+        box2.set_border_width(5)
+        box1.pack_start(box2, True, True, 0)
+        box2.show()
+        # Title
+        titletext = "Software changes to apply"
+        titlelabel = Gtk.Label(label=f"<b><span size='large'>{titletext}</span></b>")
+        titlelabel.set_use_markup(True)
+        box2.pack_start(titlelabel, False, False, 0)
+        self.tree_store = Gtk.TreeStore(str)
+        sw = Gtk.ScrolledWindow()
+        sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        sw.add(self.display(self.store_changes()))
+        sw.show()
+        box2.pack_start(sw, True, True, 5)
+        box2 = Gtk.HBox(homogeneous=False, spacing=5)
+        box2.set_border_width(5)
+        box1.pack_start(box2, False, False, 5)
+        box2.show()
+        # Add button
+        box2.pack_start(self.create_bbox(), True, True, 5)
+        self.confirm_window.show_all()
+
+    def display(self, model):
+        self.view = Gtk.TreeView(model=model)
+        self.renderer = Gtk.CellRendererText()
+        self.column0 = Gtk.TreeViewColumn("Name", self.renderer, text=0)
+        self.view.append_column(self.column0)
+        self.view.set_headers_visible(False)
+        self.view.expand_all()
+        return self.view
+
+    def store_changes(self):
+        packages_dictionary = get_pkg_changes_data(pkg_to_uninstall, pkg_to_install)
+        self.tree_store.clear()
+        global total_num
+        r_num = 0
+        u_num = 0
+        i_num = 0
+        ri_num = 0
+        if bool(packages_dictionary['remove']):
+            r_num = len(packages_dictionary['remove'])
+            message = f'Installed packages to be REMOVED: {r_num}'
+            r_pinter = self.tree_store.append(None, [message])
+            for line in packages_dictionary['remove']:
+                self.tree_store.append(r_pinter, [line])
+        if bool(packages_dictionary['upgrade']):
+            u_num = len(packages_dictionary['upgrade'])
+            message = f'Installed packages to be UPGRADED: {u_num}'
+            u_pinter = self.tree_store.append(None, [message])
+            for line in packages_dictionary['upgrade']:
+                self.tree_store.append(u_pinter, [line])
+        if bool(packages_dictionary['install']):
+            i_num = len(packages_dictionary['install'])
+            message = f'New packages to be INSTALLED: {i_num}'
+            i_pinter = self.tree_store.append(None, [message])
+            for line in packages_dictionary['install']:
+                self.tree_store.append(i_pinter, [line])
+        if bool(packages_dictionary['reinstall']):
+            ri_num = len(packages_dictionary['reinstall'])
+            message = f'Installed packages to be REINSTALL: {ri_num}'
+            ri_pinter = self.tree_store.append(None, [message])
+            for line in packages_dictionary['reinstall']:
+                self.tree_store.append(ri_pinter, [line])
+        total_num = r_num + u_num + i_num + ri_num
+        return self.tree_store
 
 
 class not_root(Gtk.Window):
