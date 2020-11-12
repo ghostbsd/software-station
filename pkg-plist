@@ -1,0 +1,5 @@
+bin/software-station
+etc/sudoers.d/software-station
+%%PYTHON_SITELIBDIR%%/software_station_pkg.py
+%%PYTHON_SITELIBDIR%%/software_station_xpm.py
+share/applications/software-station.desktop
