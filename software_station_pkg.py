@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/local/bin/python3
 
 from subprocess import Popen, PIPE
 

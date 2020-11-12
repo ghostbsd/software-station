@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/local/bin/python3
 
 from gi.repository import Gtk
 from gi.repository.GdkPixbuf import Pixbuf
