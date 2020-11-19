@@ -313,11 +313,11 @@ class TableWindow(Gtk.Window):
         self.unlock_ui()
 
     def unlock_ui(self):
-        self.search_entry.set_sensitive(True)
-        self.available_toggle.set_sensitive(True)
-        self.installed_toggle.set_sensitive(True)
         self.origin_treeview.set_sensitive(True)
         self.pkgtreeview.set_sensitive(True)
+        self.available_toggle.set_sensitive(True)
+        self.installed_toggle.set_sensitive(True)
+        self.search_entry.set_sensitive(True)
 
     def lock_ui(self):
         self.search_entry.set_sensitive(False)
