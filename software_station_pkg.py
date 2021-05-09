@@ -1,6 +1,41 @@
 #!/usr/local/bin/python3
 
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, run
+import socket
+
+
+def network_stat():
+    cmd = "netstat -rn | grep default"
+    netstat = run(cmd, shell=True)
+    return "UP" if netstat.returncode == 0 else 'DOWN'
+
+
+def repo_online():
+    cmd = "pkg -vv | grep -B 1 'enabled.*yes' | grep url"
+    raw_url = Popen(
+        cmd,
+        shell=True,
+        stdout=PIPE,
+        close_fds=True,
+        universal_newlines=True,
+        encoding='utf-8'
+    )
+    server = list(filter(None, raw_url.stdout.read().split('/')))[1]
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(5)
+        s.connect((server, 80))
+    except OSError:
+        return False
+    else:
+        s.close()
+        return True
+
+
+def sync_with_repository():
+    cmd = "pkg update -f"
+    pkg_out = run(cmd, shell=True)
+    return True if pkg_out.returncode == 0 else False
 
 
 def available_package_origin():
@@ -143,10 +178,18 @@ def get_pkg_to_remove_output(packages):
 
 
 def get_pkg_changes_data(remove_list, install_list):
-    install_pkg = get_pkg_to_install_output(' '.join(install_list))
-    install_pkg_list = install_pkg.splitlines()
-    remove_pkg = get_pkg_to_remove_output(' '.join(remove_list))
-    remove_pkg_list = remove_pkg.splitlines()
+    if install_list:
+        install_pkg = get_pkg_to_install_output(' '.join(install_list))
+        install_pkg_list = install_pkg.splitlines()
+    else:
+        install_pkg = 'None'
+        install_pkg_list = []
+    if remove_list:
+        remove_pkg = get_pkg_to_remove_output(' '.join(remove_list))
+        remove_pkg_list = remove_pkg.splitlines()
+    else:
+        remove_pkg = 'None'
+        remove_pkg_list = []
     pkg_to_remove = []
     pkg_to_upgrade = []
     pkg_to_install = []
