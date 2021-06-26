@@ -403,7 +403,7 @@ class TableWindow(Gtk.Window):
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
         vBox.pack_start(hBox, False, False, 10)
-        title = "<b>Warning this system need to be upgraded!</b>"
+        title = "<b>Warning this system needs to be upgraded!</b>"
         title_label = Gtk.Label(label=title)
         title_label.set_use_markup(True)
         title_label.set_justify(Gtk.Justification.CENTER)
