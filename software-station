@@ -403,7 +403,7 @@ class TableWindow(Gtk.Window):
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
         vBox.pack_start(hBox, False, False, 10)
-        title = "<b>Warning this system need to be upgrade!</b>"
+        title = "<b>Warning this system need to be upgraded!</b>"
         title_label = Gtk.Label(label=title)
         title_label.set_use_markup(True)
         title_label.set_justify(Gtk.Justification.CENTER)
@@ -412,7 +412,7 @@ class TableWindow(Gtk.Window):
         hBox.show()
         vBox.pack_start(hBox, False, False, 5)
         msg = "Installing software without upgrading could harm this installation.\n" \
-            "\nWould you like to upgrade now?"
+            "Would you like to upgrade now?"
         msg_label = Gtk.Label(label=msg)
         hBox.pack_start(msg_label, True, True, 20)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
