@@ -14,7 +14,7 @@ from setuptools import setup
 # ,,python setup.py build_i18n -m''
 
 # silence pyflakes, __VERSION__ is properly assigned below...
-__VERSION__ = '1.2'
+__VERSION__ = '1.3'
 
 # for line in open('gbinstall', 'r').readlines():
 #     if (line.startswith('__VERSION__')):
