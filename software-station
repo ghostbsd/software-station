@@ -37,7 +37,6 @@ import pwd
 import os
 from time import sleep
 
-
 from software_station_pkg import (
     search_packages,
     available_package_origin,
@@ -50,7 +49,8 @@ from software_station_pkg import (
     fetch_packages,
     network_stat,
     repo_online,
-    sync_with_repository
+    sync_with_repository,
+    start_update_station
 )
 
 from software_station_xpm import xpmPackageCategory
@@ -306,6 +306,7 @@ class TableWindow(Gtk.Window):
         self.pkg_statistic.set_text('<small>Syncing statistic</small>')
         self.pkg_statistic.set_use_markup(True)
         self.network = network_stat()
+        self.need_upgrade = False
         if self.network == 'UP':
             self.online = repo_online()
         else:
@@ -314,7 +315,8 @@ class TableWindow(Gtk.Window):
         if self.online is True:
             msg = 'syncing with the repository'
             GLib.idle_add(self.update_progress, self.progress, 0.1, msg)
-            sync_with_repository()
+            if sync_with_repository() == 'UPGRADE':
+                self.need_upgrade = True
             sleep(1)
             msg = 'syncing available packages'
             GLib.idle_add(self.update_progress, self.progress, 0.2, msg)
@@ -345,6 +347,8 @@ class TableWindow(Gtk.Window):
         GLib.idle_add(self.unlock_ui)
         if self.online is False:
             GLib.idle_add(self.confirm_offline)
+        elif self.need_upgrade is True:
+            GLib.idle_add(self.confirm_upgrade)
 
     def hide_window(self, button, window):
         window.hide()
@@ -353,6 +357,7 @@ class TableWindow(Gtk.Window):
         window = Gtk.Window()
         window.set_title("Software Station")
         window.connect("delete-event", Gtk.main_quit)
+        window.set_keep_above(True)
         window.set_size_request(200, 80)
         box1 = Gtk.VBox(homogeneous=False, spacing=0)
         window.add(box1)
@@ -379,6 +384,53 @@ class TableWindow(Gtk.Window):
         apply_img.set_from_icon_name('gtk-close', 1)
         close_button.set_image(apply_img)
         close_button.connect("clicked", Gtk.main_quit)
+        hBox.pack_end(close_button, False, False, 5)
+        window.show_all()
+
+    def start_upgrade(self, button):
+        start_update_station()
+        Gtk.main_quit()
+
+    def confirm_upgrade(self):
+        window = Gtk.Window()
+        window.set_title("Upgrade Needed")
+        window.connect("delete-event", Gtk.main_quit)
+        window.set_keep_above(True)
+        window.set_size_request(200, 80)
+        vBox = Gtk.VBox(homogeneous=False, spacing=0)
+        window.add(vBox)
+        vBox.show()
+        hBox = Gtk.HBox(homogeneous=False, spacing=0)
+        hBox.show()
+        vBox.pack_start(hBox, False, False, 10)
+        title = "<b>Warning this system need to be upgrade!</b>"
+        title_label = Gtk.Label(label=title)
+        title_label.set_use_markup(True)
+        title_label.set_justify(Gtk.Justification.CENTER)
+        hBox.pack_start(title_label, True, True, 10)
+        hBox = Gtk.HBox(homogeneous=False, spacing=0)
+        hBox.show()
+        vBox.pack_start(hBox, False, False, 5)
+        msg = "Installing software without upgrading could harm this installation.\n" \
+            "\nWould you like to upgrade now?"
+        msg_label = Gtk.Label(label=msg)
+        hBox.pack_start(msg_label, True, True, 20)
+        hBox = Gtk.HBox(homogeneous=False, spacing=0)
+        hBox.show()
+        vBox.pack_end(hBox, False, False, 5)
+        offline_button = Gtk.Button()
+        offline_button.set_label("Yes")
+        apply_img = Gtk.Image()
+        apply_img.set_from_icon_name('gtk-yes', 1)
+        offline_button.set_image(apply_img)
+        offline_button.connect("clicked", self.start_upgrade)
+        hBox.pack_end(offline_button, False, False, 5)
+        close_button = Gtk.Button()
+        close_button.set_label("No")
+        apply_img = Gtk.Image()
+        apply_img.set_from_icon_name('gtk-no', 1)
+        close_button.set_image(apply_img)
+        close_button.connect("clicked", self.hide_window, window)
         hBox.pack_end(close_button, False, False, 5)
         window.show_all()
 

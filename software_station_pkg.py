@@ -33,9 +33,26 @@ def repo_online():
 
 
 def sync_with_repository():
-    cmd = "pkg update -f"
-    pkg_out = run(cmd, shell=True)
-    return True if pkg_out.returncode == 0 else False
+    cmd = "yes | pkg update -f"
+    pkg_out = run(
+        cmd,
+        shell=True,
+        stdout=PIPE,
+        universal_newlines=True,
+        encoding='utf-8'
+    )
+    if pkg_out.returncode == 0:
+        if 'Newer FreeBSD version' in pkg_out.stdout:
+            return 'UPGRADE'
+        return 'SYNCED'
+    else:
+        return 'FAILLED'
+
+
+def start_update_station():
+    cmd = "update-station check-now"
+    update_station = Popen(cmd, shell=True)
+    return True if update_station.returncode == 0 else False
 
 
 def available_package_origin():
