@@ -50,10 +50,13 @@ from software_station_pkg import (
     network_stat,
     repo_online,
     sync_with_repository,
-    start_update_station
+    start_update_station,
+    repository_is_syncing
 )
 
 from software_station_xpm import xpmPackageCategory
+
+__VERSION__ = '1.4'
 
 global pkg_to_install
 pkg_to_install = []
@@ -226,7 +229,6 @@ class TableWindow(Gtk.Window):
                 if not line:
                     break
                 msg = line.rstrip()
-                print(msg)
                 GLib.idle_add(self.update_progress, self.progress, fraction, msg)
             fraction += increment
 
@@ -239,7 +241,6 @@ class TableWindow(Gtk.Window):
                 if not line:
                     break
                 msg = line.rstrip()
-                print(msg)
                 GLib.idle_add(self.update_progress, self.progress, fraction, msg)
             fraction += increment
 
@@ -252,7 +253,6 @@ class TableWindow(Gtk.Window):
                 if not line:
                     break
                 msg = line.rstrip()
-                print(msg)
                 GLib.idle_add(self.update_progress, self.progress, fraction, msg)
             fraction += increment
         msg = 'Updating data'
@@ -288,7 +288,6 @@ class TableWindow(Gtk.Window):
                 self.pkg_statistic.set_use_markup(True)
             self.search_entry.set_text('')
             self.update_pkg_store()
-            print(data)
 
     def sync_available_packages(self):
         self.available_category = available_package_origin()
@@ -311,8 +310,7 @@ class TableWindow(Gtk.Window):
             self.online = repo_online()
         else:
             self.online = False
-
-        if self.online is True:
+        if self.online is True and repository_is_syncing() is False:
             msg = 'syncing with the repository'
             GLib.idle_add(self.update_progress, self.progress, 0.1, msg)
             if sync_with_repository() == 'UPGRADE':
@@ -326,7 +324,7 @@ class TableWindow(Gtk.Window):
         GLib.idle_add(self.update_progress, self.progress, 0.4, msg)
         self.sync_installed_packages()
         sleep(1)
-        if self.online is True:
+        if self.online is True and repository_is_syncing() is False:
             avail = self.available_pkg['avail']
             msg = "Packages available:"
             self.pkg_statistic.set_text(f'<small>{msg} {avail}</small>')
@@ -347,6 +345,8 @@ class TableWindow(Gtk.Window):
         GLib.idle_add(self.unlock_ui)
         if self.online is False:
             GLib.idle_add(self.confirm_offline)
+        elif repository_is_syncing():
+            GLib.idle_add(self.confirm_offline)
         elif self.need_upgrade is True:
             GLib.idle_add(self.confirm_upgrade)
 
@@ -366,6 +366,8 @@ class TableWindow(Gtk.Window):
             msg = 'Network device is offline'
         elif self.online is False:
             msg = "Can't reach software repository"
+        elif repository_is_syncing():
+            msg = "Software repositories are syncing with new software packages"
         label = Gtk.Label(label=msg)
         box1.pack_start(label, True, True, 0)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
@@ -437,10 +439,10 @@ class TableWindow(Gtk.Window):
     def unlock_ui(self):
         self.origin_treeview.set_sensitive(True)
         self.pkgtreeview.set_sensitive(True)
-        if self.online is True:
+        if self.online is True and repository_is_syncing() is False:
             self.available_toggle.set_sensitive(True)
         self.installed_toggle.set_sensitive(True)
-        if self.online is True:
+        if self.online is True and repository_is_syncing() is False:
             self.search_entry.set_sensitive(True)
 
     def lock_ui(self):
@@ -461,7 +463,6 @@ class TableWindow(Gtk.Window):
     def selected_software(self, view, event):
         selection = self.pkgtreeview.get_selection()
         (model, iter) = selection.get_selected()
-        print(model[iter][1])
 
     def search_release(self, widget, event):
         self.searchs = widget.get_text()
@@ -490,7 +491,7 @@ class TableWindow(Gtk.Window):
     def category_store_sync(self):
         self.store.clear()
         self.search_entry.set_text('')
-        if self.online is True:
+        if self.online is True and repository_is_syncing() is False:
             categories = self.available_category
         else:
             categories = self.installed_category
@@ -552,8 +553,6 @@ class TableWindow(Gtk.Window):
         else:
             self.apply_button.set_sensitive(True)
             self.cancel_button.set_sensitive(True)
-        print('package to install', pkg_to_install)
-        print('package to uninstall', pkg_to_uninstall)
 
     def MainBook(self):
         self.table = Gtk.Table(n_rows=12, n_columns=12, homogeneous=True)

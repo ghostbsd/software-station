@@ -4,7 +4,6 @@ from gi.repository import Gtk
 from gi.repository.GdkPixbuf import Pixbuf
 import glob
 import os
-import sys
 
 found = glob.glob('/usr/local/share/icons/mate/24x24/*/*png')
 
