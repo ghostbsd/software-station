@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/env python3
 """
 Copyright (c) 2017-2018, GhostBSD. All rights reserved.
 
@@ -262,13 +262,13 @@ class TableWindow(Gtk.Window):
         self.sync_installed_packages()
         pkg_to_install = []
         pkg_to_uninstall = []
-        self.apply_button.set_sensitive(False)
-        self.cancel_button.set_sensitive(False)
+        GLib.idle_add(self.apply_button.set_sensitive, False)
+        GLib.idle_add(self.cancel_button.set_sensitive, False)
         fraction += increment
         msg = 'Completed'
         GLib.idle_add(self.update_progress, self.progress, fraction, msg)
         sleep(1)
-        self.progress.hide()
+        GLib.idle_add(self.progress.hide)
         GLib.idle_add(self.stop_apply_tread)
         self.unlock_ui()
         GLib.idle_add(self.unlock_ui)
@@ -327,10 +327,11 @@ class TableWindow(Gtk.Window):
         if self.online is True and repository_is_syncing() is False:
             avail = self.available_pkg['avail']
             msg = "Packages available:"
-            self.pkg_statistic.set_text(f'<small>{msg} {avail}</small>')
-            self.pkg_statistic.set_use_markup(True)
+            GLib.idle_add(self.pkg_statistic.set_text, f'<small>{msg} {avail}</small>')
+            GLib.idle_add(self.pkg_statistic.set_use_markup, True)
         else:
-            self.installed_toggle.set_active(True)
+            GLib.idle_add(self.installed_toggle.set_active, True)
+        GLib.idle_add(self.update_progress, self.progress, 0.4, msg)
         msg = 'store packages categories'
         GLib.idle_add(self.update_progress, self.progress, 0.8, msg)
         sleep(0.5)
