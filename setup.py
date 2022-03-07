@@ -13,12 +13,14 @@ from setuptools import setup
 # to update i18n .mo files (and merge .pot file into .po files):
 # ,,python setup.py build_i18n -m''
 
-# silence pyflakes, __VERSION__ is properly assigned below...
-__VERSION__ = '1.3'
+for line in open('software-station').readlines():
+    if (line.startswith('__VERSION__')):
+        exec(line.strip())
+        break
+# Silence flake8, __VERSION__ is properly assigned below
+else:
+    __VERSION__ = '1.3'
 
-# for line in open('gbinstall', 'r').readlines():
-#     if (line.startswith('__VERSION__')):
-#         exec(line.strip())
 PROGRAM_VERSION = __VERSION__
 
 

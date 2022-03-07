@@ -2,6 +2,7 @@
 
 from subprocess import Popen, PIPE, run
 import socket
+import requests
 
 
 def network_stat():
@@ -30,6 +31,20 @@ def repo_online():
     else:
         s.close()
         return True
+
+
+def repository_is_syncing():
+    raw_url = Popen(
+        'pkg -vv | grep -B 1 "enabled.*yes" | grep url',
+        shell=True,
+        stdout=PIPE,
+        close_fds=True,
+        universal_newlines=True,
+        encoding='utf-8'
+    )
+    pkg_url = raw_url.stdout.read().strip().split('"')[1]
+    syncing_url = f'{pkg_url}/.syncing'
+    return True if requests.get(syncing_url).status_code == 200 else False
 
 
 def sync_with_repository():
