@@ -3,12 +3,12 @@
 
 import os
 import sys
-# from glob import glob
+from glob import glob
 from setuptools import setup
 
-# import DistUtilsExtra.command.build_extra
-# import DistUtilsExtra.command.build_i18n
-# import DistUtilsExtra.command.clean_i18n
+import DistUtilsExtra.command.build_extra
+import DistUtilsExtra.command.build_i18n
+import DistUtilsExtra.command.clean_i18n
 
 # to update i18n .mo files (and merge .pot file into .po files):
 # ,,python setup.py build_i18n -m''
@@ -44,13 +44,13 @@ data_files = [
     (f'{prefix}/etc/sudoers.d', ['sudoers.d/software-station']),
 ]
 
-# data_files.extend(datafilelist('{prefix}/share/locale'.format(prefix=sys.prefix), 'build/mo'))
+data_files.extend(datafilelist('{prefix}/share/locale'.format(prefix=sys.prefix), 'build/mo'))
 
-# cmdclass ={
-#             "build" : DistUtilsExtra.command.build_extra.build_extra,
-#             "build_i18n" :  DistUtilsExtra.command.build_i18n.build_i18n,
-#             "clean": DistUtilsExtra.command.clean_i18n.clean_i18n,
-# }
+cmdclass ={
+    "build" : DistUtilsExtra.command.build_extra.build_extra,
+    "build_i18n" :  DistUtilsExtra.command.build_i18n.build_i18n,
+    "clean": DistUtilsExtra.command.clean_i18n.clean_i18n,
+}
 
 setup(name="software-station",
       version=PROGRAM_VERSION,
