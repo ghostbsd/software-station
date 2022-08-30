@@ -35,7 +35,12 @@ import threading
 import crypt
 import pwd
 import os
+import gettext
 from time import sleep
+
+gettext.bindtextdomain('software-station', '/usr/local/share/locale')
+gettext.textdomain('software-station')
+_ = gettext.gettext
 
 from software_station_pkg import (
     search_packages,
@@ -69,7 +74,7 @@ class TableWindow(Gtk.Window):
 
     def __init__(self):
         Gtk.Window.__init__(self)
-        self.set_title("Software Station")
+        self.set_title(_("Software Station"))
         self.connect("delete-event", Gtk.main_quit)
         self.set_size_request(850, 500)
         self.set_default_icon_name('system-software-install')
@@ -81,27 +86,27 @@ class TableWindow(Gtk.Window):
         self.box1.show()
         self.box1.pack_start(toolbar, False, False, 0)
         self.previousbutton = Gtk.ToolButton()
-        self.previousbutton.set_label("Back")
+        self.previousbutton.set_label(_("Back"))
         self.previousbutton.set_is_important(True)
         self.previousbutton.set_icon_name("go-previous")
         self.previousbutton.set_sensitive(False)
         toolbar.insert(self.previousbutton, 1)
         self.nextbutton = Gtk.ToolButton()
-        self.nextbutton.set_label("Forward")
+        self.nextbutton.set_label(_("Forward"))
         self.nextbutton.set_is_important(True)
         self.nextbutton.set_icon_name("go-next")
         self.nextbutton.set_sensitive(False)
         toolbar.insert(self.nextbutton, 2)
 
-        self.available_toggle = Gtk.RadioToolButton(label="All Software")
-        self.available_toggle.set_property("tooltip-text", "All Software")
+        self.available_toggle = Gtk.RadioToolButton(label= _("All Software"))
+        self.available_toggle.set_property("tooltip-text", _("All Software"))
         self.available_toggle.set_icon_name("package_network")
         self.available_or_installed = 'available'
         self.available_toggle.connect("toggled", self.all_or_installed, "available")
         self.available_toggle.set_sensitive(False)
         toolbar.insert(self.available_toggle, 3)
-        self.installed_toggle = Gtk.RadioToolButton(label="Installed Software", group=self.available_toggle)
-        self.installed_toggle.set_property("tooltip-text", "Installed Software")
+        self.installed_toggle = Gtk.RadioToolButton(label= _("Installed Software"), group=self.available_toggle)
+        self.installed_toggle.set_property("tooltip-text", _("Installed Software"))
         self.installed_toggle.set_icon_name("system")
         self.installed_toggle.connect("toggled", self.all_or_installed, "installed")
         self.installed_toggle.set_sensitive(False)
@@ -114,27 +119,27 @@ class TableWindow(Gtk.Window):
         self.search_entry = Gtk.Entry()
         self.search_entry.set_icon_from_icon_name(Gtk.EntryIconPosition.PRIMARY, "search")
         self.search_entry.connect("key-release-event", self.search_release)
-        self.search_entry.set_property("tooltip-text", "Search Software")
+        self.search_entry.set_property("tooltip-text", _("Search Software"))
         self.search_entry.set_sensitive(False)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         toolitem.add(hBox)
         hBox.show()
         hBox.pack_start(self.search_entry, False, False, 0)
         self.apply_button = Gtk.Button()
-        self.apply_button.set_label("Apply")
+        self.apply_button.set_label(_("Apply"))
         apply_img = Gtk.Image()
         apply_img.set_from_icon_name('gtk-apply', 1)
         self.apply_button.set_image(apply_img)
-        self.apply_button.set_property("tooltip-text", "Apply change on the system")
+        self.apply_button.set_property("tooltip-text", _("Apply change on the system"))
         self.apply_button.set_sensitive(False)
         hBox.pack_end(self.apply_button, False, False, 0)
         self.cancel_button = Gtk.Button()
-        self.cancel_button.set_label("Cancel")
+        self.cancel_button.set_label(_("Cancel"))
         cancel_img = Gtk.Image()
         cancel_img.set_from_icon_name('gtk-cancel', 1)
         self.cancel_button.set_image(cancel_img)
         self.cancel_button.set_sensitive(False)
-        self.cancel_button.set_property("tooltip-text", "Cancel changes")
+        self.cancel_button.set_property("tooltip-text", _("Cancel changes"))
         hBox.pack_end(self.cancel_button, False, False, 0)
         self.apply_button.connect("clicked", self.confirm_packages)
         self.cancel_button.connect("clicked", self.cancel_change)
@@ -221,7 +226,7 @@ class TableWindow(Gtk.Window):
         fraction = 0
         increment = 1.0 / num
         for pkg in pkg_to_uninstall:
-            msg = f"Uninstalling {pkg}"
+            msg = _(f"Uninstalling {pkg}")
             GLib.idle_add(self.update_progress, self.progress, fraction, msg)
             dpkg = delete_packages(pkg)
             while True:
@@ -233,7 +238,7 @@ class TableWindow(Gtk.Window):
             fraction += increment
 
         for pkg in pkg_to_install:
-            msg = f"Fetching {pkg}"
+            msg = _(f"Fetching {pkg}")
             GLib.idle_add(self.update_progress, self.progress, fraction, msg)
             dpkg = fetch_packages(pkg)
             while True:
@@ -245,7 +250,7 @@ class TableWindow(Gtk.Window):
             fraction += increment
 
         for pkg in pkg_to_install:
-            msg = f"Installing {pkg}"
+            msg = _(f"Installing {pkg}")
             GLib.idle_add(self.update_progress, self.progress, fraction, msg)
             dpkg = install_packages(pkg)
             while True:
@@ -255,7 +260,7 @@ class TableWindow(Gtk.Window):
                 msg = line.rstrip()
                 GLib.idle_add(self.update_progress, self.progress, fraction, msg)
             fraction += increment
-        msg = 'Updating data'
+        msg = _('Updating data')
         GLib.idle_add(self.update_progress, self.progress, fraction, msg)
         self.sync_available_packages()
         sleep(1)
@@ -265,7 +270,7 @@ class TableWindow(Gtk.Window):
         GLib.idle_add(self.apply_button.set_sensitive, False)
         GLib.idle_add(self.cancel_button.set_sensitive, False)
         fraction += increment
-        msg = 'Completed'
+        msg = _('Completed')
         GLib.idle_add(self.update_progress, self.progress, fraction, msg)
         sleep(1)
         GLib.idle_add(self.progress.hide)
@@ -278,12 +283,12 @@ class TableWindow(Gtk.Window):
             self.available_or_installed = data
             if data == 'available':
                 avail = self.available_pkg['avail']
-                msg = "Packages available:"
+                msg = _("Packages available:")
                 self.pkg_statistic.set_text(f'<small>{msg} {avail}</small>')
                 self.pkg_statistic.set_use_markup(True)
             else:
                 installed = self.installed_pkg['avail']
-                msg = "Installed packages:"
+                msg = _("Installed packages:")
                 self.pkg_statistic.set_text(f'<small>{msg} {installed}</small>')
                 self.pkg_statistic.set_use_markup(True)
             self.search_entry.set_text('')
@@ -302,7 +307,7 @@ class TableWindow(Gtk.Window):
         progress.set_text(msg)
 
     def initial_sync(self):
-        self.pkg_statistic.set_text('<small>Syncing statistic</small>')
+        self.pkg_statistic.set_text(_('<small>Syncing statistic</small>'))
         self.pkg_statistic.set_use_markup(True)
         self.network = network_stat()
         self.need_upgrade = False
@@ -311,34 +316,34 @@ class TableWindow(Gtk.Window):
         else:
             self.online = False
         if self.online is True and repository_is_syncing() is False:
-            msg = 'syncing with the repository'
+            msg = _('syncing with the repository')
             GLib.idle_add(self.update_progress, self.progress, 0.1, msg)
             if sync_with_repository() == 'UPGRADE':
                 self.need_upgrade = True
             sleep(1)
-            msg = 'syncing available packages'
+            msg = _('syncing available packages')
             GLib.idle_add(self.update_progress, self.progress, 0.2, msg)
             self.sync_available_packages()
             sleep(1)
-        msg = 'syncing installed packages'
+        msg = _('syncing installed packages')
         GLib.idle_add(self.update_progress, self.progress, 0.4, msg)
         self.sync_installed_packages()
         sleep(1)
         if self.online is True and repository_is_syncing() is False:
             avail = self.available_pkg['avail']
-            msg = "Packages available:"
+            msg = _("Packages available:")
             GLib.idle_add(self.pkg_statistic.set_text, f'<small>{msg} {avail}</small>')
             GLib.idle_add(self.pkg_statistic.set_use_markup, True)
         else:
             GLib.idle_add(self.installed_toggle.set_active, True)
         GLib.idle_add(self.update_progress, self.progress, 0.4, msg)
-        msg = 'store packages categories'
+        msg = _('store packages categories')
         GLib.idle_add(self.update_progress, self.progress, 0.8, msg)
         sleep(0.5)
         GLib.idle_add(self.category_store_sync)
         # self.category_store_sync()
         sleep(1)
-        msg = 'Completed'
+        msg = _('Completed')
         GLib.idle_add(self.update_progress, self.progress, 1.0, msg)
         sleep(1)
         self.progress.hide()
@@ -356,7 +361,7 @@ class TableWindow(Gtk.Window):
 
     def confirm_offline(self):
         window = Gtk.Window()
-        window.set_title("Software Station")
+        window.set_title(_("Software Station"))
         window.connect("delete-event", Gtk.main_quit)
         window.set_keep_above(True)
         window.set_size_request(200, 80)
@@ -364,25 +369,25 @@ class TableWindow(Gtk.Window):
         window.add(box1)
         box1.show()
         if self.network == 'Down':
-            msg = 'Network device is offline'
+            msg = _('Network device is offline')
         elif self.online is False:
-            msg = "Can't reach software repository"
+            msg = _("Can't reach software repository")
         elif repository_is_syncing():
-            msg = "Software repositories are syncing with new software packages"
+            msg = _("Software repositories are syncing with new software packages")
         label = Gtk.Label(label=msg)
         box1.pack_start(label, True, True, 0)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
         box1.pack_end(hBox, False, False, 5)
         offline_button = Gtk.Button()
-        offline_button.set_label("Use Offline")
+        offline_button.set_label(_("Use Offline"))
         apply_img = Gtk.Image()
         apply_img.set_from_icon_name('gtk-ok', 1)
         offline_button.set_image(apply_img)
         offline_button.connect("clicked", self.hide_window, window)
         hBox.pack_end(offline_button, False, False, 5)
         close_button = Gtk.Button()
-        close_button.set_label("Close")
+        close_button.set_label(_("Close"))
         apply_img = Gtk.Image()
         apply_img.set_from_icon_name('gtk-close', 1)
         close_button.set_image(apply_img)
@@ -396,7 +401,7 @@ class TableWindow(Gtk.Window):
 
     def confirm_upgrade(self):
         window = Gtk.Window()
-        window.set_title("Upgrade Needed")
+        window.set_title(_("Upgrade Needed"))
         window.connect("delete-event", Gtk.main_quit)
         window.set_keep_above(True)
         window.set_size_request(200, 80)
@@ -406,7 +411,7 @@ class TableWindow(Gtk.Window):
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
         vBox.pack_start(hBox, False, False, 10)
-        title = "<b>Warning this system needs to be upgraded!</b>"
+        title = _("<b>Warning this system needs to be upgraded!</b>")
         title_label = Gtk.Label(label=title)
         title_label.set_use_markup(True)
         title_label.set_justify(Gtk.Justification.CENTER)
@@ -414,22 +419,22 @@ class TableWindow(Gtk.Window):
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
         vBox.pack_start(hBox, False, False, 5)
-        msg = "Installing software without upgrading could harm this installation.\n" \
-            "Would you like to upgrade now?"
+        msg = _("Installing software without upgrading could harm this installation.\n" \
+            "Would you like to upgrade now?")
         msg_label = Gtk.Label(label=msg)
         hBox.pack_start(msg_label, True, True, 20)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
         vBox.pack_end(hBox, False, False, 5)
         offline_button = Gtk.Button()
-        offline_button.set_label("Yes")
+        offline_button.set_label(_("Yes"))
         apply_img = Gtk.Image()
         apply_img.set_from_icon_name('gtk-yes', 1)
         offline_button.set_image(apply_img)
         offline_button.connect("clicked", self.start_upgrade)
         hBox.pack_end(offline_button, False, False, 5)
         close_button = Gtk.Button()
-        close_button.set_label("No")
+        close_button.set_label(_("No"))
         apply_img = Gtk.Image()
         apply_img.set_from_icon_name('gtk-no', 1)
         close_button.set_image(apply_img)
@@ -595,7 +600,7 @@ class TableWindow(Gtk.Window):
         self.check_cell = Gtk.CellRendererToggle()
         self.check_cell.set_property('activatable', True)
         self.check_cell.connect('toggled', self.add_and_rm_pkg, self.pkg_store)
-        check_column = Gtk.TreeViewColumn("Check", self.check_cell)
+        check_column = Gtk.TreeViewColumn(_("Check"), self.check_cell)
         check_column.add_attribute(self.check_cell, "active", 5)
         check_column.set_resizable(True)
         self.pkgtreeview.append_column(check_column)
@@ -605,26 +610,26 @@ class TableWindow(Gtk.Window):
         pixbuf_column.set_resizable(True)
         self.pkgtreeview.append_column(pixbuf_column)
         name_cell = Gtk.CellRendererText()
-        name_column = Gtk.TreeViewColumn('Package Name', name_cell, text=1)
+        name_column = Gtk.TreeViewColumn(_('Package Name'), name_cell, text=1)
         # name_column.set_sizing(Gtk.TREE_VIEW_COLUMN_AUTOSIZE)
         name_column.set_fixed_width(150)
         name_column.set_sort_column_id(1)
         name_column.set_resizable(True)
         self.pkgtreeview.append_column(name_column)
         version_cell = Gtk.CellRendererText()
-        version_column = Gtk.TreeViewColumn('Version', version_cell, text=2)
+        version_column = Gtk.TreeViewColumn(_('Version'), version_cell, text=2)
         version_column.set_fixed_width(100)
         version_column.set_sort_column_id(2)
         version_column.set_resizable(True)
         self.pkgtreeview.append_column(version_column)
         size_cell = Gtk.CellRendererText()
-        size_column = Gtk.TreeViewColumn('Size', size_cell, text=3)
+        size_column = Gtk.TreeViewColumn(_('Size'), size_cell, text=3)
         size_column.set_fixed_width(100)
         size_column.set_sort_column_id(3)
         size_column.set_resizable(True)
         # self.pkgtreeview.append_column(size_column)
         comment_cell = Gtk.CellRendererText()
-        comment_column = Gtk.TreeViewColumn('Comment', comment_cell, text=4)
+        comment_column = Gtk.TreeViewColumn(_('Comment'), comment_cell, text=4)
         comment_column.set_sort_column_id(4)
         comment_column.set_resizable(True)
         self.pkgtreeview.append_column(comment_column)
@@ -670,7 +675,7 @@ class TableWindow(Gtk.Window):
         self.confirm_window.set_size_request(600, 300)
         self.confirm_window.set_keep_above(True)
         # self.confirm_window.set_resizable(False)
-        self.confirm_window.set_title("Confirm software changes")
+        self.confirm_window.set_title(_("Confirm software changes"))
         self.confirm_window.set_border_width(0)
         self.confirm_window.set_position(Gtk.WindowPosition.CENTER)
         self.confirm_window.set_default_icon_name('system-software-install')
@@ -682,7 +687,7 @@ class TableWindow(Gtk.Window):
         box1.pack_start(box2, True, True, 0)
         box2.show()
         # Title
-        titletext = "Software changes to apply"
+        titletext = _("Software changes to apply")
         titlelabel = Gtk.Label(label=f"<b><span size='large'>{titletext}</span></b>")
         titlelabel.set_use_markup(True)
         box2.pack_start(titlelabel, False, False, 0)
@@ -704,7 +709,7 @@ class TableWindow(Gtk.Window):
     def display(self, model):
         self.view = Gtk.TreeView(model=model)
         self.renderer = Gtk.CellRendererText()
-        self.column0 = Gtk.TreeViewColumn("Name", self.renderer, text=0)
+        self.column0 = Gtk.TreeViewColumn(_("Name"), self.renderer, text=0)
         self.view.append_column(self.column0)
         self.view.set_headers_visible(False)
         self.view.expand_all()
@@ -720,25 +725,25 @@ class TableWindow(Gtk.Window):
         ri_num = 0
         if bool(packages_dictionary['remove']):
             r_num = len(packages_dictionary['remove'])
-            message = f'Installed packages to be REMOVED: {r_num}'
+            message = _(f'Installed packages to be REMOVED: {r_num}')
             r_pinter = self.tree_store.append(None, [message])
             for line in packages_dictionary['remove']:
                 self.tree_store.append(r_pinter, [line])
         if bool(packages_dictionary['upgrade']):
             u_num = len(packages_dictionary['upgrade'])
-            message = f'Installed packages to be UPGRADED: {u_num}'
+            message = _(f'Installed packages to be UPGRADED: {u_num}')
             u_pinter = self.tree_store.append(None, [message])
             for line in packages_dictionary['upgrade']:
                 self.tree_store.append(u_pinter, [line])
         if bool(packages_dictionary['install']):
             i_num = len(packages_dictionary['install'])
-            message = f'New packages to be INSTALLED: {i_num}'
+            message = _(f'New packages to be INSTALLED: {i_num}')
             i_pinter = self.tree_store.append(None, [message])
             for line in packages_dictionary['install']:
                 self.tree_store.append(i_pinter, [line])
         if bool(packages_dictionary['reinstall']):
             ri_num = len(packages_dictionary['reinstall'])
-            message = f'Installed packages to be REINSTALL: {ri_num}'
+            message = _(f'Installed packages to be REINSTALL: {ri_num}')
             ri_pinter = self.tree_store.append(None, [message])
             for line in packages_dictionary['reinstall']:
                 self.tree_store.append(ri_pinter, [line])
@@ -749,19 +754,19 @@ class TableWindow(Gtk.Window):
 class not_root(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self)
-        self.set_title("Software Station")
+        self.set_title(_("Software Station"))
         self.connect("delete-event", Gtk.main_quit)
         self.set_size_request(200, 80)
         box1 = Gtk.VBox(homogeneous=False, spacing=0)
         self.add(box1)
         box1.show()
-        label = Gtk.Label(label='You need to be root')
+        label = Gtk.Label(label= _('You need to be root'))
         box1.pack_start(label, True, True, 0)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
         box1.pack_end(hBox, False, False, 5)
         ok_button = Gtk.Button()
-        ok_button.set_label("OK")
+        ok_button.set_label(_("OK"))
         apply_img = Gtk.Image()
         apply_img.set_from_icon_name('gtk-ok', 1)
         ok_button.set_image(apply_img)
@@ -784,19 +789,19 @@ class confirmation(Gtk.Window):
 
     def wrong_password(self):
         window = Gtk.Window()
-        window.set_title("Software Station")
+        window.set_title(_("Software Station"))
         window.connect("delete-event", Gtk.main_quit)
         window.set_size_request(200, 80)
         box1 = Gtk.VBox(homogeneous=False, spacing=0)
         window.add(box1)
         box1.show()
-        label = Gtk.Label(label='Wrong password')
+        label = Gtk.Label(label= _('Wrong password'))
         box1.pack_start(label, True, True, 0)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
         box1.pack_end(hBox, False, False, 5)
         ok_button = Gtk.Button()
-        ok_button.set_label("OK")
+        ok_button.set_label(_("OK"))
         apply_img = Gtk.Image()
         apply_img.set_from_icon_name('gtk-ok', 1)
         ok_button.set_image(apply_img)
@@ -806,13 +811,13 @@ class confirmation(Gtk.Window):
 
     def __init__(self, user):
         Gtk.Window.__init__(self)
-        self.set_title("Software Station")
+        self.set_title(_("Software Station"))
         self.connect("delete-event", Gtk.main_quit)
         self.set_size_request(200, 80)
         vBox = Gtk.VBox(homogeneous=False, spacing=0)
         self.add(vBox)
         vBox.show()
-        label = Gtk.Label(label=f'Confirm {user} password: ')
+        label = Gtk.Label(label= _(f'Confirm {user} password: '))
         vBox.pack_start(label, True, True, 5)
         self.passwd = Gtk.Entry()
         self.passwd.set_visibility(False)
@@ -825,7 +830,7 @@ class confirmation(Gtk.Window):
         hBox.show()
         vBox.pack_end(hBox, False, False, 5)
         ok_button = Gtk.Button()
-        ok_button.set_label("OK")
+        ok_button.set_label(_("OK"))
         apply_img = Gtk.Image()
         apply_img.set_from_icon_name('gtk-ok', 1)
         ok_button.set_image(apply_img)

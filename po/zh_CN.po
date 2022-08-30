@@ -1,0 +1,139 @@
+# Chinese translations for PACKAGE package
+# PACKAGE 软件包的简体中文翻译.
+# Copyright (C) 2022 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# SAIHAZE <saihaze@outlook.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-08-30 22:04+0800\n"
+"PO-Revision-Date: 2022-08-30 22:04+0800\n"
+"Last-Translator: SAIHAZE <saihaze@outlook.com>\n"
+"Language-Team: Chinese (simplified) <i18n-zh@googlegroups.com>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../software-station:77 ../software-station:364 ../software-station:757
+#: ../software-station:792 ../software-station:814
+msgid "Software Station"
+msgstr "软件中心"
+
+#: ../software-station:89
+msgid "Back"
+msgstr "下一页"
+
+#: ../software-station:95
+msgid "Forward"
+msgstr "上一页"
+
+#: ../software-station:101 ../software-station:102
+msgid "All Software"
+msgstr "所有软件"
+
+#: ../software-station:108 ../software-station:109
+msgid "Installed Software"
+msgstr "已安装软件"
+
+#: ../software-station:122
+msgid "Search Software"
+msgstr "搜索软件"
+
+#: ../software-station:129
+msgid "Apply"
+msgstr "应用"
+
+#: ../software-station:133
+msgid "Apply change on the system"
+msgstr "应用系统更改"
+
+#: ../software-station:137
+msgid "Cancel"
+msgstr "取消"
+
+#: ../software-station:142
+msgid "Cancel changes"
+msgstr "取消更改"
+
+#: ../software-station:229
+msgid "Uninstalling {pkg}"
+msgstr "卸载 {pkg}"
+
+#: ../software-station:241
+msgid "Fetching {pkg}"
+msgstr "下载 {pkg}"
+
+#: ../software-station:253
+msgid "Installing {pkg}"
+msgstr "安装 {pkg}"
+
+#: ../software-station:286 ../software-station:334
+msgid "Packages available:"
+msgstr "可用包："
+
+#: ../software-station:291
+msgid "Installed packages:"
+msgstr "已安装包："
+
+#: ../software-station:374
+msgid "Can't reach software repository"
+msgstr "无法连接软件源"
+
+#: ../software-station:376
+msgid "Software repositories are syncing with new software packages"
+msgstr "软件源正在同步新的软件包"
+
+#: ../software-station:383
+msgid "Use Offline"
+msgstr "离线使用"
+
+#: ../software-station:390
+msgid "Close"
+msgstr "关闭"
+
+#: ../software-station:404
+msgid "Upgrade Needed"
+msgstr "需要更新"
+
+#: ../software-station:414
+msgid "<b>Warning this system needs to be upgraded!</b>"
+msgstr "<b>警告这个系统需要更新了！</b>"
+
+#: ../software-station:422
+msgid ""
+"Installing software without upgrading could harm this installation.\n"
+"Would you like to upgrade now?"
+msgstr ""
+"不更新时安装软件可能损坏这次安装。\n"
+"想要现在就更新吗？"
+
+#: ../software-station:430
+msgid "Yes"
+msgstr "是"
+
+#: ../software-station:437
+msgid "No"
+msgstr "否"
+
+#: ../software-station:603
+msgid "Check"
+msgstr "选择"
+
+#: ../software-station:678
+msgid "Confirm software changes"
+msgstr "确认软件更新"
+
+#: ../software-station:690
+msgid "Software changes to apply"
+msgstr "待应用的软件更改"
+
+#: ../software-station:712
+msgid "Name"
+msgstr "名称"
+
+#: ../software-station:769 ../software-station:804 ../software-station:833
+msgid "OK"
+msgstr "好"
