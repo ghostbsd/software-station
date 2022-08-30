@@ -1,0 +1,137 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-08-30 22:13+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../software-station:77 ../software-station:364 ../software-station:757
+#: ../software-station:792 ../software-station:814
+msgid "Software Station"
+msgstr ""
+
+#: ../software-station:89
+msgid "Back"
+msgstr ""
+
+#: ../software-station:95
+msgid "Forward"
+msgstr ""
+
+#: ../software-station:101 ../software-station:102
+msgid "All Software"
+msgstr ""
+
+#: ../software-station:108 ../software-station:109
+msgid "Installed Software"
+msgstr ""
+
+#: ../software-station:122
+msgid "Search Software"
+msgstr ""
+
+#: ../software-station:129
+msgid "Apply"
+msgstr ""
+
+#: ../software-station:133
+msgid "Apply change on the system"
+msgstr ""
+
+#: ../software-station:137
+msgid "Cancel"
+msgstr ""
+
+#: ../software-station:142
+msgid "Cancel changes"
+msgstr ""
+
+#: ../software-station:229
+msgid "Uninstalling {pkg}"
+msgstr ""
+
+#: ../software-station:241
+msgid "Fetching {pkg}"
+msgstr ""
+
+#: ../software-station:253
+msgid "Installing {pkg}"
+msgstr ""
+
+#: ../software-station:286 ../software-station:334
+msgid "Packages available:"
+msgstr ""
+
+#: ../software-station:291
+msgid "Installed packages:"
+msgstr ""
+
+#: ../software-station:374
+msgid "Can't reach software repository"
+msgstr ""
+
+#: ../software-station:376
+msgid "Software repositories are syncing with new software packages"
+msgstr ""
+
+#: ../software-station:383
+msgid "Use Offline"
+msgstr ""
+
+#: ../software-station:390
+msgid "Close"
+msgstr ""
+
+#: ../software-station:404
+msgid "Upgrade Needed"
+msgstr ""
+
+#: ../software-station:414
+msgid "<b>Warning this system needs to be upgraded!</b>"
+msgstr ""
+
+#: ../software-station:422
+msgid ""
+"Installing software without upgrading could harm this installation.\n"
+"Would you like to upgrade now?"
+msgstr ""
+
+#: ../software-station:430
+msgid "Yes"
+msgstr ""
+
+#: ../software-station:437
+msgid "No"
+msgstr ""
+
+#: ../software-station:603
+msgid "Check"
+msgstr ""
+
+#: ../software-station:678
+msgid "Confirm software changes"
+msgstr ""
+
+#: ../software-station:690
+msgid "Software changes to apply"
+msgstr ""
+
+#: ../software-station:712
+msgid "Name"
+msgstr ""
+
+#: ../software-station:769 ../software-station:804 ../software-station:833
+msgid "OK"
+msgstr ""

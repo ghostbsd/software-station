@@ -38,6 +38,8 @@ import os
 import gettext
 from time import sleep
 
+gettext.bindtextdomain('software-station', '/usr/local/share/locale')
+gettext.textdomain('software-station')
 _ = gettext.gettext
 
 from software_station_pkg import (
@@ -96,14 +98,14 @@ class TableWindow(Gtk.Window):
         self.nextbutton.set_sensitive(False)
         toolbar.insert(self.nextbutton, 2)
 
-        self.available_toggle = Gtk.RadioToolButton(label=_("All Software"))
+        self.available_toggle = Gtk.RadioToolButton(label= _("All Software"))
         self.available_toggle.set_property("tooltip-text", _("All Software"))
         self.available_toggle.set_icon_name("package_network")
         self.available_or_installed = 'available'
         self.available_toggle.connect("toggled", self.all_or_installed, "available")
         self.available_toggle.set_sensitive(False)
         toolbar.insert(self.available_toggle, 3)
-        self.installed_toggle = Gtk.RadioToolButton(label=_("Installed Software"), group=self.available_toggle)
+        self.installed_toggle = Gtk.RadioToolButton(label= _("Installed Software"), group=self.available_toggle)
         self.installed_toggle.set_property("tooltip-text", _("Installed Software"))
         self.installed_toggle.set_icon_name("system")
         self.installed_toggle.connect("toggled", self.all_or_installed, "installed")
@@ -758,7 +760,7 @@ class not_root(Gtk.Window):
         box1 = Gtk.VBox(homogeneous=False, spacing=0)
         self.add(box1)
         box1.show()
-        label = Gtk.Label(label=_('You need to be root'))
+        label = Gtk.Label(label= _('You need to be root'))
         box1.pack_start(label, True, True, 0)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
@@ -793,7 +795,7 @@ class confirmation(Gtk.Window):
         box1 = Gtk.VBox(homogeneous=False, spacing=0)
         window.add(box1)
         box1.show()
-        label = Gtk.Label(label=_('Wrong password'))
+        label = Gtk.Label(label= _('Wrong password'))
         box1.pack_start(label, True, True, 0)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
@@ -815,7 +817,7 @@ class confirmation(Gtk.Window):
         vBox = Gtk.VBox(homogeneous=False, spacing=0)
         self.add(vBox)
         vBox.show()
-        label = Gtk.Label(label=_(f'Confirm {user} password: '))
+        label = Gtk.Label(label= _(f'Confirm {user} password: '))
         vBox.pack_start(label, True, True, 5)
         self.passwd = Gtk.Entry()
         self.passwd.set_visibility(False)
