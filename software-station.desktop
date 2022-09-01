@@ -2,8 +2,10 @@
 [Desktop Entry]
 Name=Software Station
 Name[da]=Softwarestation
+Name[ru]=Центр приложений
 Comment=Install and remove softwares
 Comment[da]=Installer og fjern software
+Comment[ru]=Установка и удаление программ
 Exec=sudo software-station
 Icon=system-software-install
 Terminal=false
