@@ -824,7 +824,7 @@ class confirmation(Gtk.Window):
         vBox = Gtk.VBox(homogeneous=False, spacing=0)
         self.add(vBox)
         vBox.show()
-        label = _("Confirm password")
+        label = _("Confirm password for")
         label = Gtk.Label(label = label + f" {user}")
         vBox.pack_start(label, True, True, 5)
         self.passwd = Gtk.Entry()
