@@ -1,18 +1,17 @@
-# Chinese translations for PACKAGE package
-# PACKAGE 软件包的简体中文翻译.
-# Copyright (C) 2022 THE PACKAGE'S COPYRIGHT HOLDER
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# SAIHAZE <saihaze@outlook.com>, 2022.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-01 10:18+0300\n"
-"PO-Revision-Date: 2022-08-30 22:04+0800\n"
-"Last-Translator: SAIHAZE <saihaze@outlook.com>\n"
-"Language-Team: Chinese (simplified) <i18n-zh@googlegroups.com>\n"
-"Language: zh_CN\n"
+"POT-Creation-Date: 2022-09-01 02:12+0300\n"
+"PO-Revision-Date: 2022-08-31 11:25+0300\n"
+"Last-Translator: Alexander Alexeev <alexax66@gmail.com>\n"
+"Language-Team: Language locale/ru\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,204 +19,205 @@ msgstr ""
 #: software-station.py:77 software-station.py:367 software-station.py:764
 #: software-station.py:799 software-station.py:821
 msgid "Software Station"
-msgstr "软件中心"
+msgstr "Центр приложений"
 
 #: software-station.py:89
 msgid "Back"
-msgstr "下一页"
+msgstr "Назад"
 
 #: software-station.py:95
 msgid "Forward"
-msgstr "上一页"
+msgstr "Вперед"
 
 #: software-station.py:101 software-station.py:102
 msgid "All Software"
-msgstr "所有软件"
+msgstr "Все приложения"
 
 #: software-station.py:108 software-station.py:109
 msgid "Installed Software"
-msgstr "已安装软件"
+msgstr "Установленные приложения"
 
 #: software-station.py:122
 msgid "Search Software"
-msgstr "搜索软件"
+msgstr "Поиск приложений"
 
 #: software-station.py:129
 msgid "Apply"
-msgstr "应用"
+msgstr "Применить"
 
 #: software-station.py:133
 msgid "Apply change on the system"
-msgstr "应用系统更改"
+msgstr "Применить изменения в системе"
 
 #: software-station.py:137 software-station.py:663
 msgid "Cancel"
-msgstr "取消"
+msgstr "Отмена"
 
 #: software-station.py:142
 msgid "Cancel changes"
-msgstr "取消更改"
+msgstr "Отменить изменения"
 
 #: software-station.py:229
 msgid "Uninstalling"
-msgstr "卸载"
+msgstr "Удаление"
 
 #: software-station.py:242
 msgid "Fetching"
-msgstr "下载"
+msgstr "Получение"
 
 #: software-station.py:255
 msgid "Installing"
-msgstr "安装"
+msgstr "Установка"
 
 #: software-station.py:266
 msgid "Updating data"
-msgstr ""
+msgstr "Обновление данных"
 
 #: software-station.py:276 software-station.py:349
 msgid "Completed"
-msgstr ""
+msgstr "Выполненно"
 
 #: software-station.py:289 software-station.py:337
 msgid "Packages available:"
-msgstr "可用包："
+msgstr "Доступные пакеты:"
 
 #: software-station.py:294
 msgid "Installed packages:"
-msgstr "已安装包："
+msgstr "Установленные пакеты:"
 
 #: software-station.py:313
 msgid "<small>Syncing statistic</small>"
-msgstr ""
+msgstr "<small>Статистика синхронизации</small>"
 
 #: software-station.py:322
 msgid "syncing with the repository"
-msgstr ""
+msgstr "синхрониация с репозиторием"
 
 #: software-station.py:327
 msgid "syncing available packages"
-msgstr ""
+msgstr "получение сведений о доступных пакетах"
 
 #: software-station.py:331
 msgid "syncing installed packages"
-msgstr ""
+msgstr "проверка установленных пакетов"
 
 #: software-station.py:343
 msgid "store packages categories"
-msgstr ""
+msgstr "сортировка пакетов по категориям"
 
 #: software-station.py:375
 msgid "Network device is offline"
-msgstr ""
+msgstr "Сетевое устройство отключено"
 
 #: software-station.py:377
 msgid "Can't reach software repository"
-msgstr "无法连接软件源"
+msgstr "Не удается получить доступ к репозиторию программного обеспечения"
 
 #: software-station.py:379
 msgid "Software repositories are syncing with new software packages"
-msgstr "软件源正在同步新的软件包"
+msgstr "Идет проверка на наличие нового программного обеспечения"
 
 #: software-station.py:386
 msgid "Use Offline"
-msgstr "离线使用"
+msgstr "Использовать в автономном режиме"
 
 #: software-station.py:393
 msgid "Close"
-msgstr "关闭"
+msgstr "Закрыть"
 
 #: software-station.py:407
 msgid "Upgrade Needed"
-msgstr "需要更新"
+msgstr "Требуется обновление"
 
 #: software-station.py:417
 msgid "<b>Warning this system needs to be upgraded!</b>"
-msgstr "<b>警告这个系统需要更新了！</b>"
+msgstr "<b>Внимание, эту систему необходимо обновить!</b>"
 
 #: software-station.py:425
 msgid ""
 "Installing software without upgrading could harm this installation.\n"
 "Would you like to upgrade now?"
 msgstr ""
-"不更新时安装软件可能损坏这次安装。\n"
-"想要现在就更新吗？"
+"Установка этого приложения без обновления необходимых пакетов может "
+"повредить эту установку.\n"
+"Хотите обновиться сейчас?"
 
 #: software-station.py:433
 msgid "Yes"
-msgstr "是"
+msgstr "Да"
 
 #: software-station.py:440
 msgid "No"
-msgstr "否"
+msgstr "Нет"
 
 #: software-station.py:606
 msgid "Check"
-msgstr "选择"
+msgstr "Установлено"
 
 #: software-station.py:611
 msgid "Icon"
-msgstr ""
+msgstr "Иконка"
 
 #: software-station.py:616
 msgid "Package Name"
-msgstr ""
+msgstr "Имя пакета"
 
 #: software-station.py:623
 msgid "Version"
-msgstr ""
+msgstr "Версия"
 
 #: software-station.py:629
 msgid "Size"
-msgstr ""
+msgstr "Размер"
 
 #: software-station.py:635
 msgid "Comment"
-msgstr ""
+msgstr "Коментарий"
 
 #: software-station.py:667
 msgid "Confirm"
-msgstr ""
+msgstr "Подтвердить"
 
 #: software-station.py:681
 msgid "Confirm software changes"
-msgstr "确认软件更新"
+msgstr "Подтверждение изменения программного обеспечения"
 
 #: software-station.py:693
 msgid "Software changes to apply"
-msgstr "待应用的软件更改"
+msgstr "Будет изменено следующее программное обеспечение"
 
 #: software-station.py:715
 msgid "Name"
-msgstr "名称"
+msgstr "Имя"
 
 #: software-station.py:731
 msgid "Installed packages to be REMOVED:"
-msgstr ""
+msgstr "Ранее установленные пакеты будут УДАЛЕНЫ:"
 
 #: software-station.py:738
 msgid "Installed packages to be UPGRADED:"
-msgstr ""
+msgstr "Ранее установленные пакеты будут ОБНОВЛЕНЫ:"
 
 #: software-station.py:745
 msgid "New packages to be INSTALLED:"
-msgstr ""
+msgstr "Новые пакеты будут УСТАНОВЛЕНЫ:"
 
 #: software-station.py:752
 msgid "Installed packages to be REINSTALL:"
-msgstr ""
+msgstr "Ранее установленные пакеты будут ПЕРЕУСТАНОВЛЕНЫ:"
 
 #: software-station.py:770
 msgid "You need to be root"
-msgstr ""
+msgstr "У Вас должны быть права root"
 
 #: software-station.py:776 software-station.py:811 software-station.py:841
 msgid "OK"
-msgstr "好"
+msgstr "ОК"
 
 #: software-station.py:805
 msgid "Wrong password"
-msgstr ""
+msgstr "Неверный пароль"
 
 #: software-station.py:827
 msgid "Confirm password"
-msgstr ""
+msgstr "Подтвердите Ваш пароль, "

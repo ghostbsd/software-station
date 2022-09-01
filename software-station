@@ -226,7 +226,8 @@ class TableWindow(Gtk.Window):
         fraction = 0
         increment = 1.0 / num
         for pkg in pkg_to_uninstall:
-            msg = _(f"Uninstalling {pkg}")
+            msg = _("Uninstalling")
+            msg = msg + f" {pkg}"
             GLib.idle_add(self.update_progress, self.progress, fraction, msg)
             dpkg = delete_packages(pkg)
             while True:
@@ -238,7 +239,8 @@ class TableWindow(Gtk.Window):
             fraction += increment
 
         for pkg in pkg_to_install:
-            msg = _(f"Fetching {pkg}")
+            msg = _("Fetching")
+            msg = msg + f" {pkg}"
             GLib.idle_add(self.update_progress, self.progress, fraction, msg)
             dpkg = fetch_packages(pkg)
             while True:
@@ -250,7 +252,8 @@ class TableWindow(Gtk.Window):
             fraction += increment
 
         for pkg in pkg_to_install:
-            msg = _(f"Installing {pkg}")
+            msg = _("Installing")
+            msg = msg + f" {pkg}"
             GLib.idle_add(self.update_progress, self.progress, fraction, msg)
             dpkg = install_packages(pkg)
             while True:
@@ -605,7 +608,7 @@ class TableWindow(Gtk.Window):
         check_column.set_resizable(True)
         self.pkgtreeview.append_column(check_column)
         pixbuf_cell = Gtk.CellRendererPixbuf()
-        pixbuf_column = Gtk.TreeViewColumn('Icon', pixbuf_cell)
+        pixbuf_column = Gtk.TreeViewColumn(_('Icon'), pixbuf_cell)
         pixbuf_column.add_attribute(pixbuf_cell, "pixbuf", 0)
         pixbuf_column.set_resizable(True)
         self.pkgtreeview.append_column(pixbuf_column)
@@ -657,11 +660,11 @@ class TableWindow(Gtk.Window):
     def create_bbox(self):
         table = Gtk.Table(n_rows=1, n_columns=2, homogeneous=False, column_spacing=5)
         img = Gtk.Image(icon_name='gtk-cancel')
-        Close_button = Gtk.Button(label="Cancel")
+        Close_button = Gtk.Button(label=_("Cancel"))
         Close_button.set_image(img)
         table.attach(Close_button, 0, 1, 0, 1)
         Close_button.connect("clicked", self.hidewindow)
-        confirm_button = Gtk.Button(label="Confirm")
+        confirm_button = Gtk.Button(label=_("Confirm"))
         table.attach(confirm_button, 1, 2, 0, 1)
         confirm_button.connect("clicked", self.apply_change)
         return table
@@ -725,25 +728,29 @@ class TableWindow(Gtk.Window):
         ri_num = 0
         if bool(packages_dictionary['remove']):
             r_num = len(packages_dictionary['remove'])
-            message = _(f'Installed packages to be REMOVED: {r_num}')
+            message = _('Installed packages to be REMOVED:')
+            message =  message +  f' {r_num}'
             r_pinter = self.tree_store.append(None, [message])
             for line in packages_dictionary['remove']:
                 self.tree_store.append(r_pinter, [line])
         if bool(packages_dictionary['upgrade']):
             u_num = len(packages_dictionary['upgrade'])
-            message = _(f'Installed packages to be UPGRADED: {u_num}')
+            message = _('Installed packages to be UPGRADED:')
+            message = message + f' {u_num}'
             u_pinter = self.tree_store.append(None, [message])
             for line in packages_dictionary['upgrade']:
                 self.tree_store.append(u_pinter, [line])
         if bool(packages_dictionary['install']):
             i_num = len(packages_dictionary['install'])
-            message = _(f'New packages to be INSTALLED: {i_num}')
+            message = _('New packages to be INSTALLED:')
+            message =  message + f' {i_num}'
             i_pinter = self.tree_store.append(None, [message])
             for line in packages_dictionary['install']:
                 self.tree_store.append(i_pinter, [line])
         if bool(packages_dictionary['reinstall']):
             ri_num = len(packages_dictionary['reinstall'])
-            message = _(f'Installed packages to be REINSTALL: {ri_num}')
+            message = _('Installed packages to be REINSTALL:')
+            message = message + f' {ri_num}'
             ri_pinter = self.tree_store.append(None, [message])
             for line in packages_dictionary['reinstall']:
                 self.tree_store.append(ri_pinter, [line])
@@ -817,7 +824,8 @@ class confirmation(Gtk.Window):
         vBox = Gtk.VBox(homogeneous=False, spacing=0)
         self.add(vBox)
         vBox.show()
-        label = Gtk.Label(label= _(f'Confirm {user} password: '))
+        label = _("Confirm password")
+        label = Gtk.Label(label = label + f" {user}")
         vBox.pack_start(label, True, True, 5)
         self.passwd = Gtk.Entry()
         self.passwd.set_visibility(False)
