@@ -1,0 +1,223 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-01 02:12+0300\n"
+"PO-Revision-Date: 2022-08-31 11:25+0300\n"
+"Last-Translator: Alexander Alexeev <alexax66@gmail.com>\n"
+"Language-Team: Language locale/ru\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: software-station.py:77 software-station.py:367 software-station.py:764
+#: software-station.py:799 software-station.py:821
+msgid "Software Station"
+msgstr "Центр приложений"
+
+#: software-station.py:89
+msgid "Back"
+msgstr "Назад"
+
+#: software-station.py:95
+msgid "Forward"
+msgstr "Вперед"
+
+#: software-station.py:101 software-station.py:102
+msgid "All Software"
+msgstr "Все приложения"
+
+#: software-station.py:108 software-station.py:109
+msgid "Installed Software"
+msgstr "Установленные приложения"
+
+#: software-station.py:122
+msgid "Search Software"
+msgstr "Поиск приложений"
+
+#: software-station.py:129
+msgid "Apply"
+msgstr "Применить"
+
+#: software-station.py:133
+msgid "Apply change on the system"
+msgstr "Применить изменения в системе"
+
+#: software-station.py:137 software-station.py:663
+msgid "Cancel"
+msgstr "Отмена"
+
+#: software-station.py:142
+msgid "Cancel changes"
+msgstr "Отменить изменения"
+
+#: software-station.py:229
+msgid "Uninstalling"
+msgstr "Удаление"
+
+#: software-station.py:242
+msgid "Fetching"
+msgstr "Получение"
+
+#: software-station.py:255
+msgid "Installing"
+msgstr "Установка"
+
+#: software-station.py:266
+msgid "Updating data"
+msgstr "Обновление данных"
+
+#: software-station.py:276 software-station.py:349
+msgid "Completed"
+msgstr "Выполненно"
+
+#: software-station.py:289 software-station.py:337
+msgid "Packages available:"
+msgstr "Доступные пакеты:"
+
+#: software-station.py:294
+msgid "Installed packages:"
+msgstr "Установленные пакеты:"
+
+#: software-station.py:313
+msgid "<small>Syncing statistic</small>"
+msgstr "<small>Статистика синхронизации</small>"
+
+#: software-station.py:322
+msgid "syncing with the repository"
+msgstr "синхрониация с репозиторием"
+
+#: software-station.py:327
+msgid "syncing available packages"
+msgstr "получение сведений о доступных пакетах"
+
+#: software-station.py:331
+msgid "syncing installed packages"
+msgstr "проверка установленных пакетов"
+
+#: software-station.py:343
+msgid "store packages categories"
+msgstr "сортировка пакетов по категориям"
+
+#: software-station.py:375
+msgid "Network device is offline"
+msgstr "Сетевое устройство отключено"
+
+#: software-station.py:377
+msgid "Can't reach software repository"
+msgstr "Не удается получить доступ к репозиторию программного обеспечения"
+
+#: software-station.py:379
+msgid "Software repositories are syncing with new software packages"
+msgstr "Идет проверка на наличие нового программного обеспечения"
+
+#: software-station.py:386
+msgid "Use Offline"
+msgstr "Использовать в автономном режиме"
+
+#: software-station.py:393
+msgid "Close"
+msgstr "Закрыть"
+
+#: software-station.py:407
+msgid "Upgrade Needed"
+msgstr "Требуется обновление"
+
+#: software-station.py:417
+msgid "<b>Warning this system needs to be upgraded!</b>"
+msgstr "<b>Внимание, эту систему необходимо обновить!</b>"
+
+#: software-station.py:425
+msgid ""
+"Installing software without upgrading could harm this installation.\n"
+"Would you like to upgrade now?"
+msgstr ""
+"Установка этого приложения без обновления необходимых пакетов может "
+"повредить эту установку.\n"
+"Хотите обновиться сейчас?"
+
+#: software-station.py:433
+msgid "Yes"
+msgstr "Да"
+
+#: software-station.py:440
+msgid "No"
+msgstr "Нет"
+
+#: software-station.py:606
+msgid "Check"
+msgstr "Установлено"
+
+#: software-station.py:611
+msgid "Icon"
+msgstr "Иконка"
+
+#: software-station.py:616
+msgid "Package Name"
+msgstr "Имя пакета"
+
+#: software-station.py:623
+msgid "Version"
+msgstr "Версия"
+
+#: software-station.py:629
+msgid "Size"
+msgstr "Размер"
+
+#: software-station.py:635
+msgid "Comment"
+msgstr "Коментарий"
+
+#: software-station.py:667
+msgid "Confirm"
+msgstr "Подтвердить"
+
+#: software-station.py:681
+msgid "Confirm software changes"
+msgstr "Подтверждение изменения программного обеспечения"
+
+#: software-station.py:693
+msgid "Software changes to apply"
+msgstr "Будет изменено следующее программное обеспечение"
+
+#: software-station.py:715
+msgid "Name"
+msgstr "Имя"
+
+#: software-station.py:731
+msgid "Installed packages to be REMOVED:"
+msgstr "Ранее установленные пакеты будут УДАЛЕНЫ:"
+
+#: software-station.py:738
+msgid "Installed packages to be UPGRADED:"
+msgstr "Ранее установленные пакеты будут ОБНОВЛЕНЫ:"
+
+#: software-station.py:745
+msgid "New packages to be INSTALLED:"
+msgstr "Новые пакеты будут УСТАНОВЛЕНЫ:"
+
+#: software-station.py:752
+msgid "Installed packages to be REINSTALL:"
+msgstr "Ранее установленные пакеты будут ПЕРЕУСТАНОВЛЕНЫ:"
+
+#: software-station.py:770
+msgid "You need to be root"
+msgstr "У Вас должны быть права root"
+
+#: software-station.py:776 software-station.py:811 software-station.py:841
+msgid "OK"
+msgstr "ОК"
+
+#: software-station.py:805
+msgid "Wrong password"
+msgstr "Неверный пароль"
+
+#: software-station.py:827
+msgid "Confirm password"
+msgstr "Подтвердите Ваш пароль, "
