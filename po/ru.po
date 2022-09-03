@@ -219,5 +219,5 @@ msgid "Wrong password"
 msgstr "Неверный пароль"
 
 #: software-station.py:827
-msgid "Confirm password"
-msgstr "Подтвердите Ваш пароль, "
+msgid "Confirm password for"
+msgstr "Подтвердите пароль для"
