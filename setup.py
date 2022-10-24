@@ -3,7 +3,6 @@
 
 import os
 import sys
-from glob import glob
 from setuptools import setup
 
 import DistUtilsExtra.command.build_extra
@@ -19,7 +18,7 @@ for line in open('software-station').readlines():
         break
 # Silence flake8, __VERSION__ is properly assigned below
 else:
-    __VERSION__ = '1.3'
+    __VERSION__ = '1.5'
 
 PROGRAM_VERSION = __VERSION__
 
@@ -46,9 +45,9 @@ data_files = [
 
 data_files.extend(datafilelist('{prefix}/share/locale'.format(prefix=sys.prefix), 'build/mo'))
 
-cmdclass ={
-    "build" : DistUtilsExtra.command.build_extra.build_extra,
-    "build_i18n" :  DistUtilsExtra.command.build_i18n.build_i18n,
+cmdclass = {
+    "build": DistUtilsExtra.command.build_extra.build_extra,
+    "build_i18n": DistUtilsExtra.command.build_i18n.build_i18n,
     "clean": DistUtilsExtra.command.clean_i18n.clean_i18n,
 }
 
