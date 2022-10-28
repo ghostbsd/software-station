@@ -61,7 +61,7 @@ from software_station_pkg import (
 
 from software_station_xpm import xpmPackageCategory
 
-__VERSION__ = '1.4'
+__VERSION__ = '1.5'
 
 global pkg_to_install
 pkg_to_install = []
@@ -98,14 +98,14 @@ class TableWindow(Gtk.Window):
         self.nextbutton.set_sensitive(False)
         toolbar.insert(self.nextbutton, 2)
 
-        self.available_toggle = Gtk.RadioToolButton(label= _("All Software"))
+        self.available_toggle = Gtk.RadioToolButton(label=_("All Software"))
         self.available_toggle.set_property("tooltip-text", _("All Software"))
         self.available_toggle.set_icon_name("package_network")
         self.available_or_installed = 'available'
         self.available_toggle.connect("toggled", self.all_or_installed, "available")
         self.available_toggle.set_sensitive(False)
         toolbar.insert(self.available_toggle, 3)
-        self.installed_toggle = Gtk.RadioToolButton(label= _("Installed Software"), group=self.available_toggle)
+        self.installed_toggle = Gtk.RadioToolButton(label=_("Installed Software"), group=self.available_toggle)
         self.installed_toggle.set_property("tooltip-text", _("Installed Software"))
         self.installed_toggle.set_icon_name("system")
         self.installed_toggle.connect("toggled", self.all_or_installed, "installed")
@@ -195,7 +195,7 @@ class TableWindow(Gtk.Window):
             nopath = False
 
         try:
-            self.searchs
+            self.search
         except AttributeError:
             self.update_pkg_store()
         else:
@@ -422,8 +422,8 @@ class TableWindow(Gtk.Window):
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
         vBox.pack_start(hBox, False, False, 5)
-        msg = _("Installing software without upgrading could harm this installation.\n" \
-            "Would you like to upgrade now?")
+        msg = _("Installing software without upgrading could harm this "
+                "installation.\nWould you like to upgrade now?")
         msg_label = Gtk.Label(label=msg)
         hBox.pack_start(msg_label, True, True, 20)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
@@ -474,18 +474,36 @@ class TableWindow(Gtk.Window):
         (model, iter) = selection.get_selected()
 
     def search_release(self, widget, event):
-        self.searchs = widget.get_text()
-        if self.searchs == '':
-            self.update_pkg_store()
+        self.search = widget.get_text()
+        try:
+            self.previous_search
+            globals()[f'stop_search_{self.previous_search}'] = True
+        except (AttributeError, KeyError):
+            pass
+        if self.search:
+            globals()[f'stop_search_{self.search}'] = False
+            GLib.idle_add(self.update_search, self.search)
         else:
-            self.update_search()
+            GLib.idle_add(self.update_pkg_store)
 
-    def update_search(self):
+        self.previous_search = self.search
+
+    def update_search(self, search):
+        if globals()[f'stop_search_{search}'] is True:
+            return
         pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 42, 0)
-        if len(self.searchs) > 1:
+        if len(self.search) > 1:
+            if globals()[f'stop_search_{search}'] is True:
+                return
             self.category_tree_selection.unselect_all()
+            if globals()[f'stop_search_{search}'] is True:
+                return
             self.pkg_store.clear()
-            for pkg in search_packages(self.searchs):
+            if globals()[f'stop_search_{search}'] is True:
+                return
+            for pkg in search_packages(search):
+                if globals()[f'stop_search_{search}'] is True:
+                    return
                 version = self.available_pkg['all'][pkg]['version']
                 size = self.available_pkg['all'][pkg]['size']
                 comment = self.available_pkg['all'][pkg]['comment']
@@ -767,7 +785,7 @@ class not_root(Gtk.Window):
         box1 = Gtk.VBox(homogeneous=False, spacing=0)
         self.add(box1)
         box1.show()
-        label = Gtk.Label(label= _('You need to be root'))
+        label = Gtk.Label(label=_('You need to be root'))
         box1.pack_start(label, True, True, 0)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
@@ -802,7 +820,7 @@ class confirmation(Gtk.Window):
         box1 = Gtk.VBox(homogeneous=False, spacing=0)
         window.add(box1)
         box1.show()
-        label = Gtk.Label(label= _('Wrong password'))
+        label = Gtk.Label(label=_('Wrong password'))
         box1.pack_start(label, True, True, 0)
         hBox = Gtk.HBox(homogeneous=False, spacing=0)
         hBox.show()
@@ -825,7 +843,7 @@ class confirmation(Gtk.Window):
         self.add(vBox)
         vBox.show()
         label = _("Confirm password for")
-        label = Gtk.Label(label = label + f" {user}")
+        label = Gtk.Label(label=label + f" {user}")
         vBox.pack_start(label, True, True, 5)
         self.passwd = Gtk.Entry()
         self.passwd.set_visibility(False)
