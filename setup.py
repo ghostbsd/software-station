@@ -43,7 +43,7 @@ data_files = [
     (f'{prefix}/etc/sudoers.d', ['sudoers.d/software-station']),
 ]
 
-data_files.extend(datafilelist('{prefix}/share/locale'.format(prefix=sys.prefix), 'build/mo'))
+data_files.extend(datafilelist(f'{prefix}/share/locale','build/mo'))
 
 cmdclass = {
     "build": DistUtilsExtra.command.build_extra.build_extra,
@@ -51,15 +51,17 @@ cmdclass = {
     "clean": DistUtilsExtra.command.clean_i18n.clean_i18n,
 }
 
-setup(name="software-station",
-      version=PROGRAM_VERSION,
-      description="GhostBSD software manager",
-      license='BSD',
-      author='Eric Turgeon',
-      url='https://github/GhostBSD/software-station/',
-      package_dir={'': '.'},
-      data_files=data_files,
-      # install_requires = [ 'setuptools', ],
-      py_modules=["software_station_pkg", "software_station_xpm"],
-      scripts=['software-station'],)
-# cmdclass = cmdclass,
+setup(
+    name="software-station",
+    version=PROGRAM_VERSION,
+    description="GhostBSD software manager",
+    license='BSD',
+    author='Eric Turgeon',
+    url='https://github/GhostBSD/software-station/',
+    package_dir={'': '.'},
+    data_files=data_files,
+    install_requires=['setuptools'],
+    py_modules=["software_station_pkg", "software_station_xpm"],
+    scripts=['software-station'],
+    cmdclass=cmdclass
+)
