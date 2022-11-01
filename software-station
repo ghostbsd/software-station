@@ -61,7 +61,7 @@ from software_station_pkg import (
 
 from software_station_xpm import xpmPackageCategory
 
-__VERSION__ = '1.5'
+__VERSION__ = '1.6'
 
 global pkg_to_install
 pkg_to_install = []
@@ -199,7 +199,7 @@ class TableWindow(Gtk.Window):
         except AttributeError:
             self.update_pkg_store()
         else:
-            self.update_search()
+            self.update_search(self.search)
         if nopath is False:
             self.pkgtreeview.set_cursor(pkg_path)
         self.apply_button.set_sensitive(False)
