@@ -43,7 +43,7 @@ data_files = [
     (f'{prefix}/etc/sudoers.d', ['sudoers.d/software-station']),
 ]
 
-data_files.extend(datafilelist(f'{prefix}/share/locale','build/mo'))
+data_files.extend(datafilelist(f'{prefix}/share/locale', 'build/mo'))
 
 cmdclass = {
     "build": DistUtilsExtra.command.build_extra.build_extra,
