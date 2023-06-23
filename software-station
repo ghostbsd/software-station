@@ -61,7 +61,7 @@ from software_station_pkg import (
 
 from software_station_xpm import xpmPackageCategory
 
-__VERSION__ = '1.6'
+__VERSION__ = '1.7'
 
 global pkg_to_install
 pkg_to_install = []
@@ -98,23 +98,33 @@ class TableWindow(Gtk.Window):
         self.nextbutton.set_sensitive(False)
         toolbar.insert(self.nextbutton, 2)
 
+        self.desc_is_shown = False
+        self.desc_toggle = Gtk.ToggleToolButton()
+        self.desc_toggle.set_property("tooltip-text", _("Show Description"))
+        #self.desc_toggle.set_label(_("Show Description"))
+        self.desc_toggle.set_icon_name("view-list")
+        self.desc_toggle.connect("toggled", self.toggle_description)
+        self.desc_toggle.set_sensitive(True)
+        toolbar.insert(self.desc_toggle, 3)
+
         self.available_toggle = Gtk.RadioToolButton(label=_("All Software"))
         self.available_toggle.set_property("tooltip-text", _("All Software"))
         self.available_toggle.set_icon_name("package_network")
         self.available_or_installed = 'available'
         self.available_toggle.connect("toggled", self.all_or_installed, "available")
         self.available_toggle.set_sensitive(False)
-        toolbar.insert(self.available_toggle, 3)
+        toolbar.insert(self.available_toggle, 4)
         self.installed_toggle = Gtk.RadioToolButton(label=_("Installed Software"), group=self.available_toggle)
         self.installed_toggle.set_property("tooltip-text", _("Installed Software"))
         self.installed_toggle.set_icon_name("system")
         self.installed_toggle.connect("toggled", self.all_or_installed, "installed")
         self.installed_toggle.set_sensitive(False)
-        toolbar.insert(self.installed_toggle, 4)
+        toolbar.insert(self.installed_toggle, 5)
+
         separatortoolitem = Gtk.SeparatorToolItem()
-        toolbar.insert(separatortoolitem, 5)
+        toolbar.insert(separatortoolitem, 6)
         toolitem = Gtk.ToolItem()
-        toolbar.insert(toolitem, 6)
+        toolbar.insert(toolitem, 7)
         toolitem.set_expand(True)
         self.search_entry = Gtk.Entry()
         self.search_entry.set_icon_from_icon_name(Gtk.EntryIconPosition.PRIMARY, "search")
@@ -179,6 +189,20 @@ class TableWindow(Gtk.Window):
         self.box1.pack_start(grid, False, False, 0)
         self.show_all()
         self.initial_thread('initial')
+
+    def toggle_description(self, widget):
+        self.desc_is_shown = not self.desc_is_shown
+        if self.desc_is_shown:
+            self.table.remove(self.pkg_sw)
+            self.table.attach(self.pkg_sw, 2, 12, 0, 8)
+            self.table.attach(self.description_sw, 2, 12, 8, 12)
+            self.pkg_sw.show()
+            self.description_sw.show_all()
+        else:
+            self.table.remove(self.pkg_sw)
+            self.table.remove(self.description_sw)
+            self.table.attach(self.pkg_sw, 2, 12, 0, 12)
+            self.pkg_sw.show()
 
     def cancel_change(self, widget):
         global pkg_to_uninstall
@@ -507,13 +531,15 @@ class TableWindow(Gtk.Window):
                 version = self.available_pkg['all'][pkg]['version']
                 size = self.available_pkg['all'][pkg]['size']
                 comment = self.available_pkg['all'][pkg]['comment']
+                description = self.available_pkg['all'][pkg]['description']
                 if pkg in pkg_to_install:
                     installed = True
                 elif pkg in pkg_to_uninstall:
                     installed = False
                 else:
                     installed = self.available_pkg['all'][pkg]['installed']
-                self.pkg_store.append([pixbuf, pkg, version, size, comment, installed])
+                self.pkg_store.append([pixbuf, pkg, version, size, comment,
+                                       installed, description])
 
     def category_store_sync(self):
         self.store.clear()
@@ -553,13 +579,15 @@ class TableWindow(Gtk.Window):
             version = pkg_d[pkg]['version']
             size = pkg_d[pkg]['size']
             comment = pkg_d[pkg]['comment']
+            description = pkg_d[pkg]['description']
             if pkg in pkg_to_install:
                 installed = True
             elif pkg in pkg_to_uninstall:
                 installed = False
             else:
                 installed = pkg_d[pkg]['installed']
-            self.pkg_store.append([pixbuf, pkg, version, size, comment, installed])
+            self.pkg_store.append([pixbuf, pkg, version, size, comment,
+                                   installed, description])
 
     def add_and_rm_pkg(self, cell, path, model):
         model[path][5] = not model[path][5]
@@ -609,10 +637,10 @@ class TableWindow(Gtk.Window):
         category_sw.add(self.origin_treeview)
         category_sw.show()
 
-        pkg_sw = Gtk.ScrolledWindow()
-        pkg_sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-        pkg_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        self.pkg_store = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str, str, bool)
+        self.pkg_sw = Gtk.ScrolledWindow()
+        self.pkg_sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        self.pkg_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self.pkg_store = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str, str, bool, str)
         self.pkgtreeview = Gtk.TreeView()
         self.pkgtreeview.set_model(self.pkg_store)
         # self.pkgtreeview.connect_after("button_press_event",
@@ -654,17 +682,33 @@ class TableWindow(Gtk.Window):
         comment_column.set_sort_column_id(4)
         comment_column.set_resizable(True)
         self.pkgtreeview.append_column(comment_column)
-        self.pkgtreeview.set_tooltip_column(4)
+        self.pkgtreeview.set_tooltip_column(6)
+
+        self.description_sw = Gtk.ScrolledWindow()
+        self.description_sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        self.description_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        description_label = Gtk.Label(
+                label="Click on a package to show its detailed description.")
+        self.description_sw.add_with_viewport(description_label)
+
         self.pkg_tree_selection = self.pkgtreeview.get_selection()
         # self.pkg_tree_selection.set_mode(Gtk.SelectionMode.NONE)
         # tree_selection.connect("clicked", self.selected_software)
         self.pkgtreeview.set_sensitive(False)
-        pkg_sw.add(self.pkgtreeview)
-        pkg_sw.show()
+        self.pkg_tree_selection.connect("changed", self.on_selection_changed,
+                                        self.description_sw, description_label)
+        self.pkg_sw.add(self.pkgtreeview)
+        self.pkg_sw.show()
         self.table.attach(category_sw, 0, 2, 0, 12)
-        self.table.attach(pkg_sw, 2, 12, 0, 12)
+        self.table.attach(self.pkg_sw, 2, 12, 0, 12)
         self.show()
         return self.table
+
+    def on_selection_changed(self, selection, description_sw, description_label):
+        model, treeiter = selection.get_selected()
+        if treeiter is not None:
+            description_label.set_text(model[treeiter][6])
+            self.description_sw.show_all()
 
     def hidewindow(self, widget):
         self.confirm_window.hide()

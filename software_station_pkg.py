@@ -78,12 +78,15 @@ def available_package_origin():
     lst.sort()
     return lst
 
+# The pkg descriptions contain new lines, :, ::, etc so the delimiters
+# <EOS> (end of section) and <EOL> (end of line) avoid collisions. These new
+# lines also prevent the use of .splitlines, thus the normal split method.
 
 def available_package_list():
-    cmd = "pkg rquery '%o:%n:%v:%sh:%c'"
+    cmd = "pkg rquery '%o<EOS>%n<EOS>%v<EOS>%sh<EOS>%c<EOS>%e<EOL>'"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                     universal_newlines=True, encoding='utf-8')
-    lst = list(set(pkg_out.stdout.read().splitlines()))
+    lst = list(filter(None, set(pkg_out.stdout.read().split('<EOL>\n'))))
     lst.sort()
     return lst
 
@@ -98,10 +101,10 @@ def installed_package_origin():
 
 
 def installed_package_list():
-    cmd = "pkg query '%o:%n:%v:%sh:%c'"
+    cmd = "pkg query '%o<EOS>%n<EOS>%v<EOS>%sh<EOS>%c<EOS>%e<EOL>'"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                     universal_newlines=True, encoding='utf-8')
-    lst = list(set(pkg_out.stdout.read().splitlines()))
+    lst = list(filter(None, set(pkg_out.stdout.read().split('<EOL>\n'))))
     lst.sort()
     return lst
 
@@ -118,7 +121,7 @@ def available_package_dictionary(origin_list):
             boolean = True
         else:
             boolean = False
-        pi = pkg.split(':')
+        pi = pkg.split('<EOS>')
         pl = pi[0].split('/')
         pkg_info = {
             'origin': pi[0],
@@ -126,6 +129,7 @@ def available_package_dictionary(origin_list):
             'version': pi[2],
             'size': pi[3],
             'comment': pi[4],
+            'description': pi[5],
             'installed': boolean
         }
         pkg_dict[pl[0]].update({pi[1]: pkg_info})
@@ -140,7 +144,7 @@ def installed_package_dictionary(origin_list):
     for origin in origin_list:
         pkg_dict[origin] = {}
     for pkg in pkg_list:
-        pi = pkg.split(':')
+        pi = pkg.split('<EOS>')
         pl = pi[0].split('/')
         pkg_info = {
             'origin': pi[0],
@@ -148,6 +152,7 @@ def installed_package_dictionary(origin_list):
             'version': pi[2],
             'size': pi[3],
             'comment': pi[4],
+            'description': pi[5],
             'installed': True
         }
         pkg_dict[pl[0]].update({pi[1]: pkg_info})
