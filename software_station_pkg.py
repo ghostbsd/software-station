@@ -71,19 +71,19 @@ def start_update_station():
 
 
 def available_package_origin():
-    cmd = "pkg rquery '%o' | cut -d '/' -f1"
+    cmd = "pkg rquery -U '%o' | cut -d '/' -f1"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                     universal_newlines=True, encoding='utf-8')
     lst = list(set(pkg_out.stdout.read().splitlines()))
     lst.sort()
     return lst
 
+
 # The pkg descriptions contain new lines, :, ::, etc so the delimiters
 # <EOS> (end of section) and <EOL> (end of line) avoid collisions. These new
 # lines also prevent the use of .splitlines, thus the normal split method.
-
 def available_package_list():
-    cmd = "pkg rquery '%o<EOS>%n<EOS>%v<EOS>%sh<EOS>%c<EOS>%e<EOL>'"
+    cmd = "pkg rquery -U '%o<EOS>%n<EOS>%v<EOS>%sh<EOS>%c<EOS>%e<EOL>'"
     pkg_out = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                     universal_newlines=True, encoding='utf-8')
     lst = list(filter(None, set(pkg_out.stdout.read().split('<EOL>\n'))))
@@ -160,9 +160,10 @@ def installed_package_dictionary(origin_list):
     return pkg_dict
 
 
-def search_packages(search):
-    cmd = f"pkg search -Q name {search} | grep 'Name  ' | cut -d : -f2 | " \
-        "cut -d ' ' -f2"
+def search_packages(search, descriptions=False):
+    D_search = '-D ' if descriptions is True else ''
+    cmd = f"pkg search -U {D_search}-Q name {search} | grep 'Name   ' " \
+        "| cut -d : -f2 | cut -d ' ' -f2"
     output = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                    universal_newlines=True, encoding='utf-8')
     lst = output.stdout.read().splitlines()
