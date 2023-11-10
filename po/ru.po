@@ -75,7 +75,7 @@ msgstr "Обновление данных"
 
 #: software-station.py:276 software-station.py:349
 msgid "Completed"
-msgstr "Выполненно"
+msgstr "Выполнено"
 
 #: software-station.py:289 software-station.py:337
 msgid "Packages available:"
@@ -91,19 +91,19 @@ msgstr "<small>Статистика синхронизации</small>"
 
 #: software-station.py:322
 msgid "syncing with the repository"
-msgstr "синхрониация с репозиторием"
+msgstr "Синхрониация с репозиторием"
 
 #: software-station.py:327
 msgid "syncing available packages"
-msgstr "получение сведений о доступных пакетах"
+msgstr "Получение сведений о доступных пакетах"
 
 #: software-station.py:331
 msgid "syncing installed packages"
-msgstr "проверка установленных пакетов"
+msgstr "Проверка установленных пакетов"
 
 #: software-station.py:343
 msgid "store packages categories"
-msgstr "сортировка пакетов по категориям"
+msgstr "Сортировка пакетов по категориям"
 
 #: software-station.py:375
 msgid "Network device is offline"
