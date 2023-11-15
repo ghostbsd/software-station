@@ -61,7 +61,7 @@ from software_station_pkg import (
 
 from software_station_xpm import xpmPackageCategory
 
-__VERSION__ = '1.8'
+__VERSION__ = '1.9'
 
 global pkg_to_install
 pkg_to_install = []
@@ -545,7 +545,7 @@ class TableWindow(Gtk.Window):
     def update_search(self, search):
         if globals()[f'stop_search_{search}'] is True:
             return
-        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 42, 0)
+        pixbuf = Gtk.IconTheme.get_default().load_icon('package-x-generic', 42, 0)
         if len(self.search) > 1:
             if globals()[f'stop_search_{search}'] is True:
                 return
@@ -595,7 +595,7 @@ class TableWindow(Gtk.Window):
 
     def update_pkg_store(self):
         self.pkg_store.clear()
-        pixbuf = Gtk.IconTheme.get_default().load_icon('emblem-package', 42, 0)
+        pixbuf = Gtk.IconTheme.get_default().load_icon('package-x-generic', 42, 0)
         if self.available_or_installed == 'available':
             pkg_d = self.available_pkg[self.category]
         else:
