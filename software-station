@@ -59,9 +59,9 @@ from software_station_pkg import (
     repository_is_syncing
 )
 
-from software_station_xpm import xpmPackageCategory
+from software_station_xpm import xpm_package_category
 
-__VERSION__ = '1.9'
+__VERSION__ = '2.0'
 
 global pkg_to_install
 pkg_to_install = []
@@ -579,7 +579,7 @@ class TableWindow(Gtk.Window):
         else:
             categories = self.installed_category
         for category in categories:
-            xmp_data = xpmPackageCategory()[category]
+            xmp_data = xpm_package_category()[category]
             xmp = GdkPixbuf.Pixbuf.new_from_xpm_data(xmp_data)
             self.store.append([xmp, category])
         self.origin_treeview.set_cursor(0)

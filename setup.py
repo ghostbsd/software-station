@@ -18,7 +18,7 @@ for line in open('software-station').readlines():
         break
 # Silence flake8, __VERSION__ is properly assigned below
 else:
-    __VERSION__ = '1.7'
+    __VERSION__ = '2.0'
 
 PROGRAM_VERSION = __VERSION__
 
