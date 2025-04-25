@@ -269,6 +269,15 @@ def get_pkg_changes_data(remove_list, install_list):
                 break
             elif stop is True:
                 pkg_to_reinstall.append(line.strip())
+    if 'REMOVED:' in install_pkg:
+        for line in install_pkg_list:
+            if 'REMOVED:' in line:
+                stop = True
+            elif stop is True and line == '':
+                stop = False
+                break
+            elif stop is True:
+                pkg_to_remove.append(line.strip())
     pkg_dictionaire = {
         'remove': pkg_to_remove,
         'upgrade': pkg_to_upgrade,
