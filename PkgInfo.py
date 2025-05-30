@@ -8,6 +8,9 @@ class PkgInfo:
         self.available: list[Package] = []
         self.installed_names: set[str] = set()
         self.index = None
+        self.load()
+
+    def load(self):
         self.load_installed()
         self.load_available()
 
@@ -46,7 +49,7 @@ class PkgInfo:
 
     def search(self, prefix: str) -> list[Package]:
         if self.index is None:
-            return []
+            return self.available
         return self.index.search_prefix(prefix)
 
     def get_installed(self) -> list[Package]:
