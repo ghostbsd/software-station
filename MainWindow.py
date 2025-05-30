@@ -1,7 +1,7 @@
 # File: MainWindow.py
 
 import gi
-from PkgInfo import PkgInfo
+from PkgDataProvider import PkgDataProvider
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
@@ -13,7 +13,7 @@ class MainWindow(Gtk.Window):
         self.set_default_size(800, 600)
         self.connect("destroy", Gtk.main_quit)
 
-        self.pkg = PkgInfo()
+        self.pkg = PkgDataProvider()
 
         self.search_entry = Gtk.Entry()
         self.search_entry.set_placeholder_text("Search packages...")
@@ -30,25 +30,30 @@ class MainWindow(Gtk.Window):
         vbox.pack_start(scrolled_window, True, True, 0)
         self.add(vbox)
 
-        self.display_packages(self.pkg.available)
+        self.display_packages(self.pkg.search(""))
 
     def on_search_entry_changed(self, entry):
         if text := entry.get_text().strip():
             packages = self.pkg.search(text)
         else:
-            packages = self.pkg.available
+            packages = self.pkg.search("")
         self.display_packages(packages)
 
     def display_packages(self, packages):
         for child in self.package_list.get_children():
             self.package_list.remove(child)
 
-        for pkg in packages:
-            label = Gtk.Label()
-            status = " (installed)" if pkg.installed else ""
-            label.set_text(f"{pkg.name} {pkg.version}{status}\n{pkg.description}")
+        if isinstance(packages, str):  # error message fallback
+            label = Gtk.Label(label=packages)
             label.set_xalign(0)
-            label.set_line_wrap(True)
             self.package_list.add(label)
+        else:
+            for pkg in packages:
+                label = Gtk.Label()
+                status = " (installed)" if pkg.installed else ""
+                label.set_text(f"{pkg.name} {pkg.version}{status}\n{pkg.description}")
+                label.set_xalign(0)
+                label.set_line_wrap(True)
+                self.package_list.add(label)
 
         self.package_list.show_all()
