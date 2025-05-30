@@ -11,6 +11,7 @@ class MainWindow(Gtk.Window):
         super().__init__(title="Software Station")
         self.set_border_width(10)
         self.set_default_size(800, 600)
+        self.connect("destroy", Gtk.main_quit)
 
         self.pkg = PkgInfo()
 
@@ -32,8 +33,7 @@ class MainWindow(Gtk.Window):
         self.display_packages(self.pkg.available)
 
     def on_search_entry_changed(self, entry):
-        text = entry.get_text().strip()
-        if text:
+        if text := entry.get_text().strip():
             packages = self.pkg.search(text)
         else:
             packages = self.pkg.available

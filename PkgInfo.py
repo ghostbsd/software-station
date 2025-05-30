@@ -16,20 +16,28 @@ class PkgInfo:
 
     def load_installed(self):
         try:
-            result = subprocess.run(['pkg', 'query', '%n'],
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.DEVNULL,
-                                    check=True, text=True)
-            self.installed_names = set(name.strip() for name in result.stdout.splitlines())
-        except subprocess.CalledProcessError:
+            result = subprocess.run(
+                ['pkg', 'query', '%n'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                check=True,
+                text=True,
+                timeout=10
+            )
+            self.installed_names = {name.strip() for name in result.stdout.splitlines()}
+        except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
             self.installed_names = set()
 
     def load_available(self):
         try:
-            result = subprocess.run(['pkg', 'query', '-a', '%n %v %e'],
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.DEVNULL,
-                                    check=True, text=True)
+            result = subprocess.run(
+                ['pkg', 'query', '-a', '%n %v %e'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                check=True,
+                text=True,
+                timeout=10
+            )
             self.available = []
             for line in result.stdout.splitlines():
                 parts = line.strip().split(' ', 2)
@@ -43,14 +51,12 @@ class PkgInfo:
                         installed=name in self.installed_names
                     ))
             self.index = PkgSearchIndex(self.available)
-        except subprocess.CalledProcessError:
+        except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
             self.available = []
             self.index = None
 
     def search(self, prefix: str) -> list[Package]:
-        if self.index is None:
-            return self.available
-        return self.index.search_prefix(prefix)
+        return self.available if self.index is None else self.index.search_prefix(prefix)
 
     def get_installed(self) -> list[Package]:
         return [pkg for pkg in self.available if pkg.installed]

@@ -14,8 +14,14 @@ class Package:
 class PkgSearchIndex:
     def __init__(self, packages: List[Package], key: str = 'name'):
         self.key = key
-        self.sorted_packages = sorted(packages, key=lambda p: getattr(p, key).casefold())
-        self.sorted_keys = [getattr(p, key).casefold() for p in self.sorted_packages]
+        self.sorted_packages = sorted(
+            packages,
+            key=lambda p: getattr(p, key).casefold() if hasattr(p, key) else ""
+        )
+        self.sorted_keys = [
+            getattr(p, key).casefold() if hasattr(p, key) else ""
+            for p in self.sorted_packages
+        ]
 
     def search_exact(self, value: str) -> Optional[Package]:
         folded_value = value.casefold()
