@@ -1,13 +1,25 @@
-# File: main_window.py
+"""Main application window for the Software Station GTK3 interface."""
+
+# pylint: disable=no-member
+
+import sys
+import os
+
+# Append current directory to the path for local imports
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import gi
-from PkgDataProvider import PkgDataProvider
-
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
+from PkgDataProvider import PkgDataProvider
+
+
 class MainWindow(Gtk.Window):
+    """Main GTK window displaying package search and results."""
+
     def __init__(self):
+        """Initialize the main application window."""
         super().__init__(title="Software Station")
         self.set_border_width(10)
         self.set_default_size(800, 600)
@@ -28,22 +40,22 @@ class MainWindow(Gtk.Window):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         vbox.pack_start(self.search_entry, False, False, 0)
         vbox.pack_start(scrolled_window, True, True, 0)
-        self.add(vbox)
 
+        self.add(vbox)
         self.display_packages(self.pkg.search(""))
 
     def on_search_entry_changed(self, entry):
-        if text := entry.get_text().strip():
-            packages = self.pkg.search(text)
-        else:
-            packages = self.pkg.search("")
+        """Handle changes in the search input field."""
+        text = entry.get_text().strip()
+        packages = self.pkg.search(text if text else "")
         self.display_packages(packages)
 
     def display_packages(self, packages):
+        """Display the list of packages in the ListBox."""
         for child in self.package_list.get_children():
             self.package_list.remove(child)
 
-        if isinstance(packages, str):  # error message fallback
+        if isinstance(packages, str):
             label = Gtk.Label(label=packages)
             label.set_xalign(0)
             self.package_list.add(label)
