@@ -9,7 +9,7 @@ import subprocess
 import sqlite3
 from typing import List, Union
 
-from PkgRepoSqlReader import PkgRepoSqlReader, Package
+from software_station.PkgRepoSqlReader import PkgRepoSqlReader, Package
 
 
 class PkgBinaryWrapper:

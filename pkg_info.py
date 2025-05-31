@@ -5,7 +5,7 @@ using the system's `pkg` tool, and allows basic search/filtering operations.
 """
 
 import subprocess
-from search_index import Package, PkgSearchIndex
+from software_station.search_index import Package, PkgSearchIndex
 
 
 class PkgInfo:

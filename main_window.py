@@ -12,7 +12,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-from PkgDataProvider import PkgDataProvider
+from software_station.PkgDataProvider import PkgDataProvider
 
 
 class MainWindow(Gtk.Window):
