@@ -1,4 +1,4 @@
-# File: MainWindow.py
+# File: main_window.py
 
 import gi
 from PkgDataProvider import PkgDataProvider
