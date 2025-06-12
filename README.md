@@ -1,4 +1,4 @@
 software-station
 ================
 
-Software Station is the future software manager using pkgng.
+Software Station is the software manager for GhostBSD.
