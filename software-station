@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2017-2018, GhostBSD. All rights reserved.
+Copyright (c) 2017-2025, GhostBSD. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -80,9 +80,8 @@ class TableWindow(Gtk.Window):
         self.set_default_icon_name('system-software-install')
         # Creating the toolbar
         toolbar = Gtk.Toolbar()
-        # toolbar.set_style(Gtk.ToolbarStyle.BOTH)
         self.box1 = Gtk.VBox(homogeneous=False, spacing=0)
-        self.add(self.box1)
+        self.add(self.box1)  # pylint: disable=no-member
         self.box1.show()
         self.box1.pack_start(toolbar, False, False, 0)
         self.previousbutton = Gtk.ToolButton()
@@ -90,18 +89,15 @@ class TableWindow(Gtk.Window):
         self.previousbutton.set_is_important(True)
         self.previousbutton.set_icon_name("go-previous")
         self.previousbutton.set_sensitive(False)
-        #toolbar.insert(self.previousbutton, 1)
         self.nextbutton = Gtk.ToolButton()
         self.nextbutton.set_label(_("Forward"))
         self.nextbutton.set_is_important(True)
         self.nextbutton.set_icon_name("go-next")
         self.nextbutton.set_sensitive(False)
-        #toolbar.insert(self.nextbutton, 2)
 
         self.desc_is_shown = False
         self.desc_toggle = Gtk.ToggleToolButton()
         self.desc_toggle.set_property("tooltip-text", _("Show Description"))
-        # self.desc_toggle.set_label(_("Show Description"))
         self.desc_toggle.set_icon_name("view-list")
         self.desc_toggle.connect("toggled", self.toggle_description)
         self.desc_toggle.set_sensitive(False)
@@ -201,7 +197,7 @@ class TableWindow(Gtk.Window):
         grid.attach(self.progress, 4, 0, 6, 1)
         grid.show()
         self.box1.pack_start(grid, False, False, 0)
-        self.show_all()
+        self.show_all()  # pylint: disable=no-member
         self.initial_thread('initial')
 
     def search_description_toggled(self, widget):
@@ -558,18 +554,27 @@ class TableWindow(Gtk.Window):
             for pkg in search_packages(search, self.description_search):
                 if globals()[f'stop_search_{search}'] is True:
                     return
-                version = self.available_pkg['all'][pkg]['version']
-                size = self.available_pkg['all'][pkg]['size']
-                comment = self.available_pkg['all'][pkg]['comment']
-                description = self.available_pkg['all'][pkg]['description']
-                if pkg in pkg_to_install:
-                    installed = True
-                elif pkg in pkg_to_uninstall:
-                    installed = False
-                else:
-                    installed = self.available_pkg['all'][pkg]['installed']
-                self.pkg_store.append([pixbuf, pkg, version, size, comment,
-                                       installed, description])
+                if not pkg:  # Skip empty package names
+                    continue
+                if not self.available_pkg.get('all'):  # Check if package data exists
+                    continue
+                try:
+                    pkg_data = self.available_pkg['all'].get(pkg, {})
+                    version = pkg_data.get('version', 'N/A')
+                    size = pkg_data.get('size', 'N/A')
+                    comment = pkg_data.get('comment', '')
+                    description = pkg_data.get('description', '')
+                    if pkg in pkg_to_install:
+                        installed = True
+                    elif pkg in pkg_to_uninstall:
+                        installed = False
+                    else:
+                        installed = pkg_data.get('installed', False)
+                    self.pkg_store.append([pixbuf, pkg, version, size, comment,
+                                           installed, description])
+                except (KeyError, TypeError) as e:
+                    print(f"Error processing package {pkg}: {e}")
+                    continue
 
     def category_store_sync(self):
         self.store.clear()
@@ -690,7 +695,6 @@ class TableWindow(Gtk.Window):
         self.pkgtreeview.append_column(pixbuf_column)
         name_cell = Gtk.CellRendererText()
         name_column = Gtk.TreeViewColumn(_('Package Name'), name_cell, text=1)
-        # name_column.set_sizing(Gtk.TREE_VIEW_COLUMN_AUTOSIZE)
         name_column.set_fixed_width(150)
         name_column.set_sort_column_id(1)
         name_column.set_resizable(True)
@@ -706,7 +710,6 @@ class TableWindow(Gtk.Window):
         size_column.set_fixed_width(100)
         size_column.set_sort_column_id(3)
         size_column.set_resizable(True)
-        # self.pkgtreeview.append_column(size_column)
         comment_cell = Gtk.CellRendererText()
         comment_column = Gtk.TreeViewColumn(_('Comment'), comment_cell, text=4)
         comment_column.set_sort_column_id(4)
@@ -726,8 +729,6 @@ class TableWindow(Gtk.Window):
         self.description_sw.add_with_viewport(description_label)
 
         self.pkg_tree_selection = self.pkgtreeview.get_selection()
-        # self.pkg_tree_selection.set_mode(Gtk.SelectionMode.NONE)
-        # tree_selection.connect("clicked", self.selected_software)
         self.pkgtreeview.set_sensitive(False)
         self.pkg_tree_selection.connect("changed", self.on_selection_changed,
                                         self.description_sw, description_label)
@@ -751,7 +752,6 @@ class TableWindow(Gtk.Window):
         self.unlock_ui()
 
     def delete_event(self, widget):
-        # don't delete; hide instead
         self.confirm_window.hide_on_delete()
 
     def create_bbox(self):
@@ -775,7 +775,6 @@ class TableWindow(Gtk.Window):
         self.confirm_window.connect("destroy", self.delete_event)
         self.confirm_window.set_size_request(600, 300)
         self.confirm_window.set_keep_above(True)
-        # self.confirm_window.set_resizable(False)
         self.confirm_window.set_title(_("Confirm software changes"))
         self.confirm_window.set_border_width(0)
         self.confirm_window.set_position(Gtk.WindowPosition.CENTER)
@@ -787,7 +786,6 @@ class TableWindow(Gtk.Window):
         box2.set_border_width(5)
         box1.pack_start(box2, True, True, 0)
         box2.show()
-        # Title
         titletext = _("Software changes to apply")
         titlelabel = Gtk.Label(
             label=f"<b><span size='large'>{titletext}</span></b>")
@@ -804,7 +802,6 @@ class TableWindow(Gtk.Window):
         box2.set_border_width(5)
         box1.pack_start(box2, False, False, 5)
         box2.show()
-        # Add button
         box2.pack_start(self.create_bbox(), True, True, 5)
         self.confirm_window.show_all()
 
@@ -865,7 +862,7 @@ class not_root(Gtk.Window):
         self.connect("delete-event", Gtk.main_quit)
         self.set_size_request(200, 80)
         box1 = Gtk.VBox(homogeneous=False, spacing=0)
-        self.add(box1)
+        self.add(box1)  # pylint: disable=no-member
         box1.show()
         label = Gtk.Label(label=_('You need to be root'))
         box1.pack_start(label, True, True, 0)
@@ -879,7 +876,7 @@ class not_root(Gtk.Window):
         ok_button.set_image(apply_img)
         ok_button.connect("clicked", Gtk.main_quit)
         hBox.pack_end(ok_button, False, False, 5)
-        self.show_all()
+        self.show_all()  # pylint: disable=no-member
 
 
 class confirmation(Gtk.Window):
@@ -900,7 +897,7 @@ class confirmation(Gtk.Window):
         window.connect("delete-event", Gtk.main_quit)
         window.set_size_request(200, 80)
         box1 = Gtk.VBox(homogeneous=False, spacing=0)
-        window.add(box1)
+        window.add(box1)  # pylint: disable=no-member
         box1.show()
         label = Gtk.Label(label=_('Wrong password'))
         box1.pack_start(label, True, True, 0)
@@ -914,7 +911,7 @@ class confirmation(Gtk.Window):
         ok_button.set_image(apply_img)
         ok_button.connect("clicked", Gtk.main_quit)
         hBox.pack_end(ok_button, False, False, 5)
-        window.show_all()
+        window.show_all()  # pylint: disable=no-member
 
     def __init__(self, user):
         Gtk.Window.__init__(self)
@@ -922,7 +919,7 @@ class confirmation(Gtk.Window):
         self.connect("delete-event", Gtk.main_quit)
         self.set_size_request(200, 80)
         vBox = Gtk.VBox(homogeneous=False, spacing=0)
-        self.add(vBox)
+        self.add(vBox)  # pylint: disable=no-member
         vBox.show()
         label = _("Confirm password for")
         label = Gtk.Label(label=label + f" {user}")
@@ -944,7 +941,7 @@ class confirmation(Gtk.Window):
         ok_button.set_image(apply_img)
         ok_button.connect("clicked", self.confirm_passwd, user)
         hBox.pack_end(ok_button, False, False, 5)
-        self.show_all()
+        self.show_all()  # pylint: disable=no-member
 
 
 if os.geteuid() == 0:
