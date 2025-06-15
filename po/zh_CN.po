@@ -6,16 +6,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-01 17:21+0300\n"
-"PO-Revision-Date: 2022-08-30 22:04+0800\n"
-"Last-Translator: SAIHAZE <saihaze@outlook.com>\n"
-"Language-Team: Chinese (simplified) <i18n-zh@googlegroups.com>\n"
+"PO-Revision-Date: 2025-06-15 22:46+0800\n"
+"Last-Translator: ykla <yklaxds@gmail.com>\n"
+"Language-Team: ykla <yklaxds@gmail.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.6\n"
 
 #: software-station.py:77 software-station.py:367 software-station.py:764
 #: software-station.py:799 software-station.py:821
@@ -60,23 +61,23 @@ msgstr "取消更改"
 
 #: software-station.py:229
 msgid "Uninstalling"
-msgstr "卸载"
+msgstr "正在卸载"
 
 #: software-station.py:242
 msgid "Fetching"
-msgstr "下载"
+msgstr "正在下载"
 
 #: software-station.py:255
 msgid "Installing"
-msgstr "安装"
+msgstr "正在安装"
 
 #: software-station.py:266
 msgid "Updating data"
-msgstr ""
+msgstr "正在更新数据"
 
 #: software-station.py:276 software-station.py:349
 msgid "Completed"
-msgstr ""
+msgstr "已完成"
 
 #: software-station.py:289 software-station.py:337
 msgid "Packages available:"
@@ -88,27 +89,27 @@ msgstr "已安装包："
 
 #: software-station.py:313
 msgid "<small>Syncing statistic</small>"
-msgstr ""
+msgstr "<small>正在同步统计信息</small>"
 
 #: software-station.py:322
 msgid "syncing with the repository"
-msgstr ""
+msgstr "正在从存储库同步"
 
 #: software-station.py:327
 msgid "syncing available packages"
-msgstr ""
+msgstr "正在同步可用的包"
 
 #: software-station.py:331
 msgid "syncing installed packages"
-msgstr ""
+msgstr "正在同步已安装的包"
 
 #: software-station.py:343
 msgid "store packages categories"
-msgstr ""
+msgstr "存储软件包类别"
 
 #: software-station.py:375
 msgid "Network device is offline"
-msgstr ""
+msgstr "网络设备已离线"
 
 #: software-station.py:377
 msgid "Can't reach software repository"
@@ -156,27 +157,27 @@ msgstr "选择"
 
 #: software-station.py:611
 msgid "Icon"
-msgstr ""
+msgstr "图标"
 
 #: software-station.py:616
 msgid "Package Name"
-msgstr ""
+msgstr "包名"
 
 #: software-station.py:623
 msgid "Version"
-msgstr ""
+msgstr "版本"
 
 #: software-station.py:629
 msgid "Size"
-msgstr ""
+msgstr "大小"
 
 #: software-station.py:635
 msgid "Comment"
-msgstr ""
+msgstr "注释"
 
 #: software-station.py:667
 msgid "Confirm"
-msgstr ""
+msgstr "确认"
 
 #: software-station.py:681
 msgid "Confirm software changes"
@@ -192,32 +193,32 @@ msgstr "名称"
 
 #: software-station.py:731
 msgid "Installed packages to be REMOVED:"
-msgstr ""
+msgstr "将删除已安装的包："
 
 #: software-station.py:738
 msgid "Installed packages to be UPGRADED:"
-msgstr ""
+msgstr "将更新已安装的包："
 
 #: software-station.py:745
 msgid "New packages to be INSTALLED:"
-msgstr ""
+msgstr "将安装新的包："
 
 #: software-station.py:752
 msgid "Installed packages to be REINSTALL:"
-msgstr ""
+msgstr "将重装已安装的包"
 
 #: software-station.py:770
 msgid "You need to be root"
-msgstr ""
+msgstr "你需要 root"
 
 #: software-station.py:776 software-station.py:811 software-station.py:841
 msgid "OK"
-msgstr "好"
+msgstr "确认"
 
 #: software-station.py:805
 msgid "Wrong password"
-msgstr ""
+msgstr "密码错误"
 
 #: software-station.py:827
 msgid "Confirm password for"
-msgstr ""
+msgstr "确认密码"
