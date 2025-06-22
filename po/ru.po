@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-01 02:12+0300\n"
-"PO-Revision-Date: 2022-08-31 11:25+0300\n"
+"PO-Revision-Date: 2025-06-22 14:44+0300\n"
 "Last-Translator: Alexander Alexeev <alexax66@gmail.com>\n"
 "Language-Team: Language locale/ru\n"
 "Language: ru\n"
@@ -91,7 +91,7 @@ msgstr "<small>Статистика синхронизации</small>"
 
 #: software-station.py:322
 msgid "syncing with the repository"
-msgstr "Синхрониация с репозиторием"
+msgstr "Синхронизация с репозиторием"
 
 #: software-station.py:327
 msgid "syncing available packages"
@@ -172,7 +172,7 @@ msgstr "Размер"
 
 #: software-station.py:635
 msgid "Comment"
-msgstr "Коментарий"
+msgstr "Комментарий"
 
 #: software-station.py:667
 msgid "Confirm"
