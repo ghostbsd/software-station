@@ -160,10 +160,11 @@ def installed_package_dictionary(origin_list):
     return pkg_dict
 
 
-def search_packages(search, descriptions=False):
+def search_packages(search, descriptions=False, case_sensitive=False):
     D_search = '-D ' if descriptions is True else ''
-    cmd = f"pkg search -U {D_search}-Q name {search} | grep 'Name   ' " \
-        "| cut -d : -f2 | cut -d ' ' -f2"
+    case_search = '-C ' if case_sensitive is True else '-i '
+    cmd = f"pkg search -U {case_search}{D_search}-Q name {search} " \
+        "| grep 'Name   ' | cut -d : -f2 | cut -d ' ' -f2"
     output = Popen(cmd, shell=True, stdout=PIPE, close_fds=True,
                    universal_newlines=True, encoding='utf-8')
     lst = output.stdout.read().splitlines()

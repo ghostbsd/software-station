@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-22 21:25+0300\n"
+"POT-Creation-Date: 2026-09-03 08:06-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: software-station.py:83 software-station.py:430 software-station.py:892
-#: software-station.py:950 software-station.py:972
+#: software-station.py:83 software-station.py:446 software-station.py:911
+#: software-station.py:969 software-station.py:991
 msgid "Software Station"
 msgstr ""
 
@@ -50,184 +50,192 @@ msgstr ""
 msgid "Search Description"
 msgstr ""
 
-#: software-station.py:153
+#: software-station.py:154
+msgid "Case Sensitive"
+msgstr ""
+
+#: software-station.py:156
+msgid "Match the search case exactly"
+msgstr ""
+
+#: software-station.py:162
 msgid "Apply"
 msgstr ""
 
-#: software-station.py:157
+#: software-station.py:166
 msgid "Apply change on the system"
 msgstr ""
 
-#: software-station.py:161 software-station.py:792
+#: software-station.py:170 software-station.py:811
 msgid "Cancel"
 msgstr ""
 
-#: software-station.py:165
+#: software-station.py:174
 msgid "Cancel changes"
 msgstr ""
 
-#: software-station.py:280
+#: software-station.py:296
 msgid "Uninstalling"
 msgstr ""
 
-#: software-station.py:294
+#: software-station.py:310
 msgid "Fetching"
 msgstr ""
 
-#: software-station.py:308
+#: software-station.py:324
 msgid "Installing"
 msgstr ""
 
-#: software-station.py:319
+#: software-station.py:335
 msgid "Updating data"
 msgstr ""
 
-#: software-station.py:329 software-station.py:410
+#: software-station.py:345 software-station.py:426
 msgid "Completed"
 msgstr ""
 
-#: software-station.py:343 software-station.py:398
+#: software-station.py:359 software-station.py:414
 msgid "Packages available:"
 msgstr ""
 
-#: software-station.py:348
+#: software-station.py:364
 msgid "Installed packages:"
 msgstr ""
 
-#: software-station.py:374
+#: software-station.py:390
 msgid "<small>Syncing statistic</small>"
 msgstr ""
 
-#: software-station.py:383
+#: software-station.py:399
 msgid "syncing with the repository"
 msgstr ""
 
-#: software-station.py:388
+#: software-station.py:404
 msgid "syncing available packages"
 msgstr ""
 
-#: software-station.py:392
+#: software-station.py:408
 msgid "syncing installed packages"
 msgstr ""
 
-#: software-station.py:405
+#: software-station.py:421
 msgid "store packages categories"
 msgstr ""
 
-#: software-station.py:439
+#: software-station.py:455
 msgid "Network device is offline"
 msgstr ""
 
-#: software-station.py:441
+#: software-station.py:457
 msgid "Can't reach software repository"
 msgstr ""
 
-#: software-station.py:444
+#: software-station.py:460
 msgid "Software repositories are syncing with new software packages"
 msgstr ""
 
-#: software-station.py:453
+#: software-station.py:469
 msgid "Use Offline"
 msgstr ""
 
-#: software-station.py:459
+#: software-station.py:475
 msgid "Close"
 msgstr ""
 
-#: software-station.py:474
+#: software-station.py:490
 msgid "Upgrade Needed"
 msgstr ""
 
-#: software-station.py:484
+#: software-station.py:500
 msgid "<b>Warning this system needs to be upgraded!</b>"
 msgstr ""
 
-#: software-station.py:492
+#: software-station.py:508
 msgid ""
 "Installing software without upgrading could harm this installation.\n"
 "Would you like to upgrade now?"
 msgstr ""
 
-#: software-station.py:500
+#: software-station.py:516
 msgid "Yes"
 msgstr ""
 
-#: software-station.py:506
+#: software-station.py:522
 msgid "No"
 msgstr ""
 
-#: software-station.py:717
+#: software-station.py:736
 msgid "Check"
 msgstr ""
 
-#: software-station.py:722
+#: software-station.py:741
 msgid "Icon"
 msgstr ""
 
-#: software-station.py:727
+#: software-station.py:746
 msgid "Package Name"
 msgstr ""
 
-#: software-station.py:733
+#: software-station.py:752
 msgid "Version"
 msgstr ""
 
-#: software-station.py:739
+#: software-station.py:758
 msgid "Size"
 msgstr ""
 
-#: software-station.py:744
+#: software-station.py:763
 msgid "Comment"
 msgstr ""
 
-#: software-station.py:757
+#: software-station.py:776
 msgid "Click on a package to show its detailed description."
 msgstr ""
 
-#: software-station.py:797
+#: software-station.py:816
 msgid "Confirm"
 msgstr ""
 
-#: software-station.py:811
+#: software-station.py:830
 msgid "Confirm software changes"
 msgstr ""
 
-#: software-station.py:821
+#: software-station.py:840
 msgid "Software changes to apply"
 msgstr ""
 
-#: software-station.py:843
+#: software-station.py:862
 msgid "Name"
 msgstr ""
 
-#: software-station.py:862
+#: software-station.py:881
 msgid "Installed packages to be REMOVED:"
 msgstr ""
 
-#: software-station.py:868
+#: software-station.py:887
 msgid "Installed packages to be UPGRADED:"
 msgstr ""
 
-#: software-station.py:874
+#: software-station.py:893
 msgid "New packages to be INSTALLED:"
 msgstr ""
 
-#: software-station.py:880
+#: software-station.py:899
 msgid "Installed packages to be REINSTALL:"
 msgstr ""
 
-#: software-station.py:898
+#: software-station.py:917
 msgid "You need to be root"
 msgstr ""
 
-#: software-station.py:904 software-station.py:962 software-station.py:992
+#: software-station.py:923 software-station.py:981 software-station.py:1011
 msgid "OK"
 msgstr ""
 
-#: software-station.py:956
+#: software-station.py:975
 msgid "Wrong password"
 msgstr ""
 
-#: software-station.py:978
+#: software-station.py:997
 msgid "Confirm password for"
 msgstr ""
