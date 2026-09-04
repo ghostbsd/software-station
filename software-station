@@ -149,6 +149,15 @@ class TableWindow(Gtk.Window):  # pylint: disable=too-many-instance-attributes,t
                                        self.search_description_toggled)
         self.search_description.set_sensitive(False)
         hbox.pack_start(self.search_description, False, False, 0)
+        self.case_sensitive_search = False
+        self.search_case_sensitive = Gtk.CheckButton(
+            label=_("Case Sensitive"))
+        self.search_case_sensitive.set_property(
+            "tooltip-text", _("Match the search case exactly"))
+        self.search_case_sensitive.connect("toggled",
+                                           self.search_case_sensitive_toggled)
+        self.search_case_sensitive.set_sensitive(False)
+        hbox.pack_start(self.search_case_sensitive, False, False, 0)
         self.apply_button = Gtk.Button()
         self.apply_button.set_label(_("Apply"))
         apply_img = Gtk.Image.new_from_icon_name('gtk-apply', 1)
@@ -210,6 +219,13 @@ class TableWindow(Gtk.Window):  # pylint: disable=too-many-instance-attributes,t
             self.description_search = True
         else:
             self.description_search = False
+
+    def search_case_sensitive_toggled(self, widget):  # pylint: disable=unused-argument
+        """Toggle whether the search is case sensitive."""
+        if widget.get_active():
+            self.case_sensitive_search = True
+        else:
+            self.case_sensitive_search = False
 
     def toggle_description(self, widget):  # pylint: disable=unused-argument
         """Toggle the display of package descriptions in the UI."""
@@ -521,12 +537,14 @@ class TableWindow(Gtk.Window):  # pylint: disable=too-many-instance-attributes,t
         if self.online is True and repository_is_syncing() is False:
             self.search_entry.set_sensitive(True)
             self.search_description.set_sensitive(True)
+            self.search_case_sensitive.set_sensitive(True)
 
     def lock_ui(self):
         """Disable UI elements during operations."""
         self.desc_toggle.set_sensitive(False)
         self.search_entry.set_sensitive(False)
         self.search_description.set_sensitive(False)
+        self.search_case_sensitive.set_sensitive(False)
         self.available_toggle.set_sensitive(False)
         self.installed_toggle.set_sensitive(False)
         self.origin_treeview.set_sensitive(False)
@@ -576,7 +594,8 @@ class TableWindow(Gtk.Window):  # pylint: disable=too-many-instance-attributes,t
             self.pkg_store.clear()
             if globals()[f'stop_search_{search}'] is True:
                 return
-            for pkg in search_packages(search, self.description_search):
+            for pkg in search_packages(search, self.description_search,
+                                       self.case_sensitive_search):
                 if globals()[f'stop_search_{search}'] is True:
                     return
                 if not pkg:  # Skip empty package names
