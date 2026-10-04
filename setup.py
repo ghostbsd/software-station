@@ -58,7 +58,7 @@ setup(
     license='BSD',
     author='Eric Turgeon',
     url='https://github/GhostBSD/software-station/',
-    package_dir={'': '.'},
+    packages=[],
     data_files=data_files,
     install_requires=['setuptools'],
     py_modules=["software_station_pkg", "software_station_xpm"],

@@ -33,7 +33,9 @@ import threading
 import pwd
 import os
 import gettext
-import crypt
+import ctypes
+import ctypes.util
+import hmac
 from time import sleep
 
 # Third-party imports
@@ -65,7 +67,7 @@ from software_station_pkg import (
 )
 from software_station_xpm import xpm_package_category
 
-__VERSION__ = '2.0'
+__VERSION__ = '2.1'
 
 # pylint: disable=global-at-module-level
 global pkg_to_install
@@ -928,6 +930,19 @@ class NotRoot(Gtk.Window):  # pylint: disable=missing-class-docstring
         self.show_all()  # pylint: disable=no-member
 
 
+libcrypt = ctypes.CDLL(ctypes.util.find_library("crypt"))
+libcrypt.crypt.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+libcrypt.crypt.restype = ctypes.c_char_p
+
+
+def verify_password(password, pwd_hash):
+    """Check a password against a crypt(3) hash using libcrypt."""
+    if not pwd_hash or pwd_hash.startswith("*"):
+        return False
+    result = libcrypt.crypt(password.encode(), pwd_hash.encode())
+    return result is not None and hmac.compare_digest(result, pwd_hash.encode())
+
+
 class Confirmation(Gtk.Window):  # pylint: disable=missing-class-docstring
     def confirm_passwd(self, widget, user):  # pylint: disable=unused-argument,redefined-outer-name
         """Verify the user's password against the stored SHA-512 hash."""
@@ -939,18 +954,15 @@ class Confirmation(Gtk.Window):  # pylint: disable=missing-class-docstring
                 for line in f:
                     if line.startswith(f"{user}:"):
                         stored_hash = line.split(':')[1]
-                        print(f"Stored hash prefix: {stored_hash[:10]}...")  # Truncate for safety
                         break
-            if not stored_hash or stored_hash in ('x', '*'):
+            if not stored_hash or stored_hash == 'x' or stored_hash.startswith('*'):
                 print(f"No valid hash found for user {user}")
                 self.hide()
                 self.wrong_password()
                 return
 
-            # Verify the input password using SHA-512
             password = self.passwd.get_text()
-            hashed_input = crypt.crypt(password, stored_hash)
-            if hashed_input == stored_hash:
+            if verify_password(password, stored_hash):
                 print("Password verified successfully")
                 self.hide()
                 TableWindow()
