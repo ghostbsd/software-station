@@ -67,7 +67,7 @@ from software_station_pkg import (
 )
 from software_station_xpm import xpm_package_category
 
-__VERSION__ = '2.1'
+__VERSION__ = '2.3'
 
 # pylint: disable=global-at-module-level
 global pkg_to_install
@@ -88,6 +88,7 @@ class TableWindow(Gtk.Window):  # pylint: disable=too-many-instance-attributes,t
         self.set_default_icon_name('system-software-install')
         # Creating the toolbar
         toolbar = Gtk.Toolbar()
+        toolbar.set_show_arrow(False)
         self.box1 = Gtk.VBox(homogeneous=False, spacing=0)
         self.add(self.box1)  # pylint: disable=no-member
         self.box1.show()
